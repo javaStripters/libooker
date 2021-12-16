@@ -7,4 +7,4 @@ spring:
     show-sql: true
 logging:
   file:
-    name: /var/log/onboarder.log
+    name: /var/log/libooker.log

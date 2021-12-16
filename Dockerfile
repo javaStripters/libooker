@@ -1,6 +1,6 @@
 FROM gradle:7-jdk17 as builder
 
-WORKDIR /opt/onboarder/app-build/
+WORKDIR /opt/libooker/app-build/
 
 # Copy gradle settings
 COPY    build.gradle    ./
@@ -20,8 +20,8 @@ ENV     TZ Europe/Moscow
 
 # Copy built jar
 
-COPY    --from=builder --chown=root /opt/onboarder/app-build/build/libs/*.jar /opt/onboarder/lib/app.jar
+COPY    --from=builder --chown=root /opt/libooker/app-build/build/libs/*.jar /opt/libooker/lib/app.jar
 
 # Copy launcher and some additional files if needed
-COPY    docker /opt/onboarder
-CMD ["/opt/onboarder/run.sh"]
+COPY    docker /opt/libooker
+CMD ["/opt/libooker/run.sh"]

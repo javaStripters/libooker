@@ -26,8 +26,8 @@ jobs:
         with:
           platforms: linux/arm64
           push: true
-          tags: thecntgfy/onboarder:latest
-          cache-from: type=registry,ref=thecntgfy/onboarder:latest
+          tags: thecntgfy/libooker:latest
+          cache-from: type=registry,ref=thecntgfy/libooker:latest
           cache-to: type=inline
 
   build-amd64:
@@ -48,8 +48,8 @@ jobs:
         with:
           platforms: linux/amd64
           push: true
-          tags: thecntgfy/onboarder:latest
-          cache-from: type=registry,ref=thecntgfy/onboarder:latest
+          tags: thecntgfy/libooker:latest
+          cache-from: type=registry,ref=thecntgfy/libooker:latest
           cache-to: type=inline
 
   deploy:
@@ -74,7 +74,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSHKEY }}
           source: "docker-compose.yml"
-          target: "/opt/onboarder"
+          target: "/opt/libooker"
 
       - name: Deploy
         uses: appleboy/ssh-action@master
@@ -84,9 +84,9 @@ jobs:
           key: ${{ secrets.SSHKEY }}
           script: |
             export NGINX_CONFIG_PATH="/etc/nginx/docker/nginx.conf"
-            export BACKEND_IMAGE="thecntgfy/onboarder"
-            export STORAGE_PATH="/var/lib/onboarder"
-            cd /opt/onboarder
+            export BACKEND_IMAGE="thecntgfy/libooker"
+            export STORAGE_PATH="/var/lib/libooker"
+            cd /opt/libooker
             docker-compose pull
             docker-compose up -d
 
