@@ -17,4 +17,10 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
     List<Booking> findAllByDate(LocalDate day);
 
     Set<Booking> findAllByUserId(long userId);
+
+    Set<Booking> findAllByUser_Username(String username);
+
+    Set<Booking> findAllByUser_UsernameAndDate(String username, LocalDate date);
+
+    void removeByUser_UsernameAndId(String username, long id);
 }

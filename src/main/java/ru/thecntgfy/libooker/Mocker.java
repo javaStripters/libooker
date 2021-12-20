@@ -5,16 +5,12 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import ru.thecntgfy.libooker.model.Booking;
+import ru.thecntgfy.libooker.model.Role;
 import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.model.Workplace;
 import ru.thecntgfy.libooker.repository.BookingRepo;
 import ru.thecntgfy.libooker.repository.UserRepo;
 import ru.thecntgfy.libooker.repository.WorkplaceRepo;
-import ru.thecntgfy.libooker.utils.TimeRange;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +23,12 @@ public class Mocker implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        User user = new User("Vasya");
+
+        User user = new User(
+                "Vasya",
+                "$2a$10$kWWOnNOiToOxcIQ7UJ.cB.XFAflYvMS5BPASR1eqqojc6H9ELWUfC",
+                Role.ADMIN
+        );
         userRepo.save(user);
 
         Workplace workplace = new Workplace("KA-123");
