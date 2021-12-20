@@ -45,8 +45,8 @@ public class BookingServiceImpl {
     }
 
     //TODO: Rework
-    public Stream<TimeRange> getAvailableSchedule(LocalDate date) {
-        User user = userRepo.findById(1L).get();
+    public Stream<TimeRange> getAvailableSchedule(LocalDate date, String username) {
+        User user = userRepo.findByUsername(username);
         Map<Workplace, TreeSet<TimeRange>> timeByWorkplace = availableTimeByWorkplace(date);
 
         TreeSet<TimeRange> availableTime = new TreeSet<>();
@@ -69,7 +69,7 @@ public class BookingServiceImpl {
     //TODO: Max user bookings
     //TODO: User not found
     //TODO: Only next week
-    public Booking book(LocalDateTime dateTime, long userId) {
+    public Booking book(LocalDateTime dateTime, String username) {
         LocalDate date = dateTime.toLocalDate();
         LocalTime time = dateTime.toLocalTime();
 
@@ -78,8 +78,8 @@ public class BookingServiceImpl {
 
         TimeRange bookedTime = TimeRange.min(untilCloses, plusDuration);
 
-        User user = userRepo.findById(userId).get();
-        Set<Booking> bookings = user.getBookings();
+        User user = userRepo.findByUsername(username);
+        Set<Booking> bookings = bookingRepo.findAllByUser_UsernameAndDate(username, date);
         if (bookings.size() >= MAX_BOOKINGS_FOR_USER)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Достигнут лимит бронирований!");
         if (bookings.stream().anyMatch(booking -> booking.getTimeRange().doesInterfere(bookedTime)))
@@ -105,12 +105,20 @@ public class BookingServiceImpl {
     }
 
     //TODO: User does not exist
-    public Set<Booking> getBookingsForUser(long userId) {
-        return bookingRepo.findAllByUserId(userId);
+    public Set<Booking> getBookingsForUser(String username) {
+        return bookingRepo.findAllByUser_Username(username);
     }
 
     public void removeBooking(long bookingId) {
         bookingRepo.deleteById(bookingId);
+    }
+
+    public void removeBooking(long bookingId, String username) {
+        Booking booking = bookingRepo.findById(bookingId).get();
+        if (!booking.getUser().getUsername().equals(username))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Только администратор может отменять брони других пользователей!");
+
+        bookingRepo.delete(booking);
     }
 
     protected Map<Workplace, TreeSet<TimeRange>> availableTimeByWorkplace(LocalDate date) {
