@@ -77,7 +77,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .cors(Customizer.withDefaults())
-//                .csrf().disable()
+                .csrf().disable()
                 // Requests
                 .authorizeRequests()
                 .antMatchers(adminServer.path("/assets/**")).permitAll()
