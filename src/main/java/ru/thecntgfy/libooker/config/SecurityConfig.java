@@ -45,7 +45,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return encoder;
     }
 
-    //TODO: remove?
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
