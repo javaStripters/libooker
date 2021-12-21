@@ -29,21 +29,16 @@ import ru.thecntgfy.libooker.security.JwtProvider;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE)
-//TODO: Check it overrides main config
 //TODO: Move Spring Boot Admin to docker container
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
-    private final JwtAuthenticationEntryPoint entryPoint;
-    private final JwtProvider jwtProvider;
     private final AdminServerProperties adminServer;
-    private final SecurityProperties securityProperties;
-    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
-    //TODO: fix constructor
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtProvider, userDetailsService);
-    }
+    private final JwtAuthenticationEntryPoint entryPoint;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final SecurityProperties securityProperties;
+
+    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -103,7 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 // Custom filters
                 .antMatcher("/bookings/**").addFilterBefore(
-                        jwtAuthenticationFilter(),
+                        jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
     }
