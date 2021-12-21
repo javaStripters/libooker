@@ -25,6 +25,7 @@ spring:
 server:
   error:
     include-stacktrace: never
+    include-message: always
 management:
   endpoints:
     web:
