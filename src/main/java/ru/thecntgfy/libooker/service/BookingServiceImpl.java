@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.thecntgfy.libooker.dto.ScheduleStep;
 import ru.thecntgfy.libooker.model.Booking;
 import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.model.Workplace;
@@ -41,7 +42,7 @@ public class BookingServiceImpl {
     }
 
     //TODO: Rework
-    public Stream<TimeRange> getAvailableSchedule(LocalDate date, String username) {
+    public Stream<ScheduleStep> getAvailableSchedule(LocalDate date, String username) {
         User user = userRepo.findByUsername(username);
         Map<Workplace, TreeSet<TimeRange>> timeByWorkplace = availableTimeByWorkplace(date);
 
@@ -53,13 +54,18 @@ public class BookingServiceImpl {
 
         List<TimeRange> schedule = TimeRange.ranges(OPENS, CLOSES, SCHEDULE_STEP);
         return schedule.stream()
-                .filter(timeRange ->
-                        availableTime.headSet(new TimeRange(timeRange.from(), CLOSES), true).stream()
-                                .anyMatch(range -> range.toInclusive().compareTo(timeRange.toInclusive()) >= 0)
-                )
-                .filter(timeRange ->
-                        user.getBookings().stream().noneMatch(booked -> booked.getTimeRange().doesInterfereExclusive(timeRange))
-                );
+                .map(timeRange -> {
+                    boolean isAvailable = availableTime.headSet(new TimeRange(timeRange.from(), CLOSES), true).stream()
+                            .anyMatch(range -> range.toInclusive().compareTo(timeRange.toInclusive()) >= 0);
+                    if (!isAvailable)
+                        return ScheduleStep.occupied(timeRange);
+
+                    boolean doesInterfereWithBooked = user.getBookings().stream().anyMatch(booked -> booked.getTimeRange().doesInterfereExclusive(timeRange));
+                    if (doesInterfereWithBooked)
+                        return ScheduleStep.self(timeRange);
+
+                    return ScheduleStep.free(timeRange);
+                });
     }
 
     //TODO: Max user bookings

@@ -6,12 +6,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ru.thecntgfy.libooker.dto.ScheduleStep;
 import ru.thecntgfy.libooker.model.Booking;
-import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.security.UserPrincipal;
 import ru.thecntgfy.libooker.service.BookingServiceImpl;
 import ru.thecntgfy.libooker.utils.TimeRange;
@@ -34,7 +33,7 @@ public class BookingController {
 
     @GetMapping("available")
     @Validated
-    public Iterable<TimeRange> available(
+    public Iterable<ScheduleStep> available(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") @FutureOrPresent LocalDate date,
             Principal principal
     ) {
@@ -57,8 +56,8 @@ public class BookingController {
         //TODO: Test restrictions
         if (!from.toLocalDate().equals(to.toLocalDate()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Бронь должна начинаться и заканчиваться в один день!");
-        if (LocalDate.now().plus(MAX_BOOKING_DISTANCE).isAfter(from.toLocalDate()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя бронировать раньше чем за" + MAX_BOOKING_DISTANCE);
+        if (LocalDateTime.now().plus(MAX_BOOKING_DISTANCE).toLocalDate().isBefore(from.toLocalDate()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя бронировать раньше чем за " + MAX_BOOKING_DISTANCE.toDays() + " дней");
 
         return bookingService.book(from, to, principal.getName());
     }
@@ -74,6 +73,7 @@ public class BookingController {
         return bookingService.getBookingsForUser(userPrincipal.getUsername());
     }
 
+    //TODO: Set flag instead of deleting
     @DeleteMapping("{bookingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeBookingByAdmin(
