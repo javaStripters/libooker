@@ -60,7 +60,9 @@ public class BookingServiceImpl {
                     if (!isAvailable)
                         return ScheduleStep.occupied(timeRange);
 
-                    boolean doesInterfereWithBooked = user.getBookings().stream().anyMatch(booked -> booked.getTimeRange().doesInterfereExclusive(timeRange));
+                    boolean doesInterfereWithBooked = user.getBookings().stream()
+                            .filter(booking -> booking.getDate().equals(date))
+                            .anyMatch(booked -> booked.getTimeRange().doesInterfereExclusive(timeRange));
                     if (doesInterfereWithBooked)
                         return ScheduleStep.self(timeRange);
 
@@ -86,7 +88,7 @@ public class BookingServiceImpl {
         TimeRange bookedTime = TimeRange.min(untilCloses, requested);
 
         User user = userRepo.findByUsername(username);
-        Set<Booking> bookings = bookingRepo.findAllByUser_UsernameAndDate(username, date);
+        Set<Booking> bookings = bookingRepo.findAllByUserAndDate(user, date);
         if (bookings.size() >= MAX_BOOKINGS_FOR_USER)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Достигнут лимит бронирований!");
         if (bookings.stream().anyMatch(booking -> booking.getTimeRange().doesInterfere(bookedTime)))

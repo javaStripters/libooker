@@ -3,6 +3,7 @@ package ru.thecntgfy.libooker.model;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ru.thecntgfy.libooker.utils.TimeRange;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ import java.time.temporal.ChronoUnit;
 @Entity
 @Getter
 @Setter
+@ToString
 public class Booking {
     public static final LocalTime OPENS = LocalTime.of(10, 0);
 
@@ -23,10 +25,12 @@ public class Booking {
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
             @JsonManagedReference
+    @ToString.Exclude
     private Workplace workplace;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
             @JsonManagedReference
+    @ToString.Exclude
     private User user;
 
     @Column(nullable = false)
