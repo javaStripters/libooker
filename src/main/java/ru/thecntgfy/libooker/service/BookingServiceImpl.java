@@ -1,6 +1,5 @@
 package ru.thecntgfy.libooker.service;
 
-import com.sun.source.tree.Tree;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,14 +15,11 @@ import ru.thecntgfy.libooker.repository.WorkplaceRepo;
 import ru.thecntgfy.libooker.utils.Pair;
 import ru.thecntgfy.libooker.utils.TimeRange;
 
-import java.awt.print.Book;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -32,9 +28,9 @@ public class BookingServiceImpl {
     private final LocalTime OPENS = LocalTime.of(10, 0);
     private final LocalTime CLOSES = LocalTime.of(20, 0);
     private final Duration SCHEDULE_STEP = Duration.ofMinutes(15);
+    private final Duration MAX_BOOKING_DURATION = Duration.ofHours(2);
     private final int MAX_BOOKINGS_FOR_USER = 5;
     private final TimeRange workTime = new TimeRange(OPENS, CLOSES);
-    private final Duration bookingDuration = Duration.ofHours(2);
 
     private final BookingRepo bookingRepo;
     private final WorkplaceRepo workplaceRepo;
@@ -69,14 +65,19 @@ public class BookingServiceImpl {
     //TODO: Max user bookings
     //TODO: User not found
     //TODO: Only next week
-    public Booking book(LocalDateTime dateTime, String username) {
-        LocalDate date = dateTime.toLocalDate();
-        LocalTime time = dateTime.toLocalTime();
+    public Booking book(LocalDateTime from, LocalDateTime to, String username) {
+        if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)
+            //TODO: Custom Exceptions
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Максимальная длительность брони: " + MAX_BOOKING_DURATION.toMinutes() + "мин.");
 
-        TimeRange untilCloses = new TimeRange(time, CLOSES);
-        TimeRange plusDuration = new TimeRange(time, time.plus(duration()));
+        LocalDate date = from.toLocalDate();
+        LocalTime startTime = from.toLocalTime();
+        LocalTime endTime = to.toLocalTime();
 
-        TimeRange bookedTime = TimeRange.min(untilCloses, plusDuration);
+        TimeRange untilCloses = new TimeRange(startTime, CLOSES);
+        TimeRange requested = new TimeRange(startTime, endTime);
+
+        TimeRange bookedTime = TimeRange.min(untilCloses, requested);
 
         User user = userRepo.findByUsername(username);
         Set<Booking> bookings = bookingRepo.findAllByUser_UsernameAndDate(username, date);
@@ -95,11 +96,10 @@ public class BookingServiceImpl {
                 }
             }
         }
-
         if (booking != null)
             bookingRepo.save(booking);
         else
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "No time available for " + dateTime);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Нет доступной брони на" + startTime + " - " + endTime);
 
         return booking;
     }
@@ -148,6 +148,6 @@ public class BookingServiceImpl {
     }
 
     protected Duration duration() {
-        return bookingDuration;
+        return MAX_BOOKING_DURATION;
     }
 }

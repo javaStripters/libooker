@@ -32,22 +32,18 @@ import java.util.List;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
-//TODO: Check it overrides main config
 @Order(Ordered.HIGHEST_PRECEDENCE)
+//TODO: Check it overrides main config
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationEntryPoint entryPoint;
     private final JwtProvider jwtProvider;
+    private final PasswordEncoder encoder;
 
     //TODO: fix constructor
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtProvider, userDetailsService);
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     //TODO: remove?
@@ -59,7 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(encoder);
     }
 
     //TODO: Check
@@ -72,10 +68,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/bookings/**").authenticated()
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint((req, res, ex) -> {throw ex; })
+                .authenticationEntryPoint(entryPoint)
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .antMatcher("/bookings/**").addFilterBefore(
+                        jwtAuthenticationFilter(),
+                        UsernamePasswordAuthenticationFilter.class
+                );
     }
 }

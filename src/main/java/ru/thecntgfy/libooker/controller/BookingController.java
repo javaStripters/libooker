@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.authentication.switchuser.SwitchUserGrantedAuthority;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.model.Booking;
 import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.security.UserPrincipal;
@@ -17,6 +18,7 @@ import ru.thecntgfy.libooker.utils.TimeRange;
 
 import javax.validation.constraints.FutureOrPresent;
 import java.security.Principal;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookingController {
     private final BookingServiceImpl bookingService;
+
+    private final Duration MAX_BOOKING_DISTANCE = Duration.ofDays(7);
 
     @GetMapping("available")
     @Validated
@@ -46,10 +50,17 @@ public class BookingController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Booking book(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
             Principal principal
     ) {
-        return bookingService.book(dateTime, principal.getName());
+        //TODO: Test restrictions
+        if (!from.toLocalDate().equals(to.toLocalDate()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Бронь должна начинаться и заканчиваться в один день!");
+        if (LocalDate.now().plus(MAX_BOOKING_DISTANCE).isAfter(from.toLocalDate()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя бронировать раньше чем за" + MAX_BOOKING_DISTANCE);
+
+        return bookingService.book(from, to, principal.getName());
     }
 
     @PreAuthorize("hasRole('ADMIN')")
