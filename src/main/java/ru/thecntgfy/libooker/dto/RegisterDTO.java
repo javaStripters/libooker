@@ -14,6 +14,7 @@ public class RegisterDTO {
     @Size(max = 255, min = 3)
     private String username;
     @Size(max = 255, min = 3)
+    //TODO: Validate password strength
     private String password;
     @NotNull
     private Role role;

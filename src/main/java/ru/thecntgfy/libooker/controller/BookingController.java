@@ -53,7 +53,6 @@ public class BookingController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
             Principal principal
     ) {
-        //TODO: Test restrictions
         if (!from.toLocalDate().equals(to.toLocalDate()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Бронь должна начинаться и заканчиваться в один день!");
         if (LocalDateTime.now().plus(MAX_BOOKING_DISTANCE).toLocalDate().isBefore(from.toLocalDate()))
