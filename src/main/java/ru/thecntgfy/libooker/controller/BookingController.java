@@ -82,6 +82,7 @@ public class BookingController {
         return bookingService.getBookingsForUser(userPrincipal.getUsername());
     }
 
+    //TODO: Return only present or future
     @GetMapping("user/active")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public Iterable<Booking> getActiveBookingsForUser(Principal principal) {
