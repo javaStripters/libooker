@@ -1,6 +1,7 @@
 package ru.thecntgfy.libooker.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -45,6 +46,9 @@ public class Booking {
     @Transient
     private TimeRange timeRange;
 
+    @Setter(AccessLevel.PRIVATE)
+    private boolean canceled = false;
+
     protected Booking() {}
 
 
@@ -69,5 +73,11 @@ public class Booking {
         if (timeRange == null)
             timeRange = new TimeRange(startTime, endTime);
         return timeRange;
+    }
+
+    public Booking cancel() {
+        if (canceled) throw new IllegalStateException("Cannot cancel already cancelled booking!");
+        canceled = true;
+        return this;
     }
 }

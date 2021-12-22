@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.dto.ScheduleStep;
 import ru.thecntgfy.libooker.model.Booking;
+import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.security.UserPrincipal;
 import ru.thecntgfy.libooker.service.BookingServiceImpl;
 import ru.thecntgfy.libooker.utils.TimeRange;
@@ -72,7 +73,11 @@ public class BookingController {
         return bookingService.getBookingsForUser(userPrincipal.getUsername());
     }
 
-    //TODO: Set flag instead of deleting
+    @GetMapping("user/active")
+    public Iterable<Booking> getActiveBookingsForUser(Principal principal) {
+        return bookingService.getActiveBookingsForUser(principal.getName());
+    }
+
     @DeleteMapping("{bookingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void removeBookingByAdmin(

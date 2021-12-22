@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.dto.ScheduleStep;
 import ru.thecntgfy.libooker.model.Booking;
@@ -21,10 +22,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookingServiceImpl {
     private final LocalTime OPENS = LocalTime.of(9, 0);
     private final LocalTime CLOSES = LocalTime.of(19, 0);
@@ -43,7 +46,7 @@ public class BookingServiceImpl {
 
     //TODO: Rework
     public Stream<ScheduleStep> getAvailableSchedule(LocalDate date, String username) {
-        User user = userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username).get();
         Map<Workplace, TreeSet<TimeRange>> timeByWorkplace = availableTimeByWorkplace(date);
 
         TreeSet<TimeRange> availableTime = new TreeSet<>();
@@ -87,8 +90,8 @@ public class BookingServiceImpl {
 
         TimeRange bookedTime = TimeRange.min(untilCloses, requested);
 
-        User user = userRepo.findByUsername(username);
-        Set<Booking> bookings = bookingRepo.findAllByUserAndDate(user, date);
+        User user = userRepo.findByUsername(username).get();
+        Set<Booking> bookings = bookingRepo.findAllActiveByUserAndDate(user, date);
         if (bookings.size() >= MAX_BOOKINGS_FOR_USER)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Достигнут лимит бронирований!");
         if (bookings.stream().anyMatch(booking -> booking.getTimeRange().doesInterfere(bookedTime)))
@@ -117,20 +120,35 @@ public class BookingServiceImpl {
         return bookingRepo.findAllByUser_Username(username);
     }
 
+    public List<Booking> getActiveBookingsForUser(String username) {
+        User user = userRepo.findByUsername(username).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User %s not found".formatted(username))
+        );
+
+        return user.getBookings()
+                .stream()
+                .filter(b -> !b.isCanceled()).collect(Collectors.toList());
+    }
+
     public void removeBooking(long bookingId) {
-        bookingRepo.deleteById(bookingId);
+        Booking booking = bookingRepo.findActiveById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронь не существует или уже отменена!"));
+
+        booking.cancel();
     }
 
     public void removeBooking(long bookingId, String username) {
-        Booking booking = bookingRepo.findById(bookingId).get();
+        Booking booking = bookingRepo.findActiveById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронь не существует или уже отменена!"));
+
         if (!booking.getUser().getUsername().equals(username))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Только администратор может отменять брони других пользователей!");
 
-        bookingRepo.delete(booking);
+        booking.cancel();
     }
 
     protected Map<Workplace, TreeSet<TimeRange>> availableTimeByWorkplace(LocalDate date) {
-        List<Booking> booked = bookingRepo.findAllByDate(date);
+        List<Booking> booked = bookingRepo.findAllActiveByDate(date);
 
         Map<Workplace, TreeSet<TimeRange>> availableTimeByWorkplace = new HashMap<>();
         for (Workplace workplace : workplaceRepo.findAll()) {
@@ -153,9 +171,5 @@ public class BookingServiceImpl {
         }
 
         return availableTimeByWorkplace;
-    }
-
-    protected Duration duration() {
-        return MAX_BOOKING_DURATION;
     }
 }
