@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import ru.thecntgfy.libooker.model.Booking;
 import ru.thecntgfy.libooker.model.User;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 //TODO: Rewrite?
+@RepositoryRestResource(exported = false)
 public interface BookingRepo extends CrudRepository<Booking, Long> {
     Page<Booking> findAll(Pageable pageable);
 

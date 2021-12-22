@@ -1,5 +1,9 @@
 package ru.thecntgfy.libooker.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -33,9 +37,10 @@ public class BookingController {
     private final Duration MAX_BOOKING_DISTANCE = Duration.ofDays(7);
 
     @GetMapping("available")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @Validated
     public Iterable<ScheduleStep> available(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") @FutureOrPresent LocalDate date,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") @FutureOrPresent @Parameter(example = "2021-12-23") LocalDate date,
             Principal principal
     ) {
         return bookingService.getAvailableSchedule(date, principal.getName()).collect(Collectors.toList());
@@ -43,15 +48,17 @@ public class BookingController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public Iterable<Booking> getBookings(Pageable pageable) {
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public Iterable<Booking> getBookings(@Parameter(hidden = true) Pageable pageable) {
         return bookingService.getBookings(pageable);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public Booking book(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Schema(example = "2021-12-23T12:00:00.00Z") LocalDateTime from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Schema(example = "2021-12-23T13:30:00.00Z") LocalDateTime to,
             Principal principal
     ) {
         if (!from.toLocalDate().equals(to.toLocalDate()))
@@ -64,22 +71,26 @@ public class BookingController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("user/{username}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public Iterable<Booking> getBookingsForUserByAdmin(@PathVariable String username) {
             return bookingService.getBookingsForUser(username);
     }
 
     @GetMapping("user")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public Iterable<Booking> getBookingsForUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return bookingService.getBookingsForUser(userPrincipal.getUsername());
     }
 
     @GetMapping("user/active")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public Iterable<Booking> getActiveBookingsForUser(Principal principal) {
         return bookingService.getActiveBookingsForUser(principal.getName());
     }
 
     @DeleteMapping("{bookingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public void removeBookingByAdmin(
             @PathVariable long bookingId,
             @AuthenticationPrincipal UserPrincipal principal
