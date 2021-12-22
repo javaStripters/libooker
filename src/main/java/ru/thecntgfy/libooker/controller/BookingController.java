@@ -36,11 +36,12 @@ public class BookingController {
 
     private final Duration MAX_BOOKING_DISTANCE = Duration.ofDays(7);
 
+    //TODO: Return FutureOrPresent?
     @GetMapping("available")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @Validated
     public Iterable<ScheduleStep> available(
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") @FutureOrPresent @Parameter(example = "2021-12-23") LocalDate date,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") @Parameter(example = "2021-12-23") LocalDate date,
             Principal principal
     ) {
         return bookingService.getAvailableSchedule(date, principal.getName()).collect(Collectors.toList());
