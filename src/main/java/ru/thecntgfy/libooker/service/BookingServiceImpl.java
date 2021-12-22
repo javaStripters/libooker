@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,6 +40,7 @@ public class BookingServiceImpl {
     private final BookingRepo bookingRepo;
     private final WorkplaceRepo workplaceRepo;
     private final UserRepo userRepo;
+    private final SimpleProductionCalendarServiceImpl productionCalendar;
 
     public Page<Booking> getBookings(Pageable pageable) {
         return bookingRepo.findAll(pageable);
@@ -54,8 +56,12 @@ public class BookingServiceImpl {
             availableTime.addAll(byWorkplace);
         }
 
-
         List<TimeRange> schedule = TimeRange.ranges(OPENS, CLOSES, SCHEDULE_STEP);
+
+        boolean isDayOff = productionCalendar.isDayOff(date);
+        if (isDayOff)
+            return schedule.stream().map(ScheduleStep::closed);
+
         return schedule.stream()
                 .map(timeRange -> {
                     boolean isAvailable = availableTime.headSet(new TimeRange(timeRange.from(), CLOSES), true).stream()
@@ -64,6 +70,7 @@ public class BookingServiceImpl {
                         return ScheduleStep.occupied(timeRange);
 
                     boolean doesInterfereWithBooked = user.getBookings().stream()
+                            .filter(Predicate.not(Booking::isCanceled))
                             .filter(booking -> booking.getDate().equals(date))
                             .anyMatch(booked -> booked.getTimeRange().doesInterfereExclusive(timeRange));
                     if (doesInterfereWithBooked)
