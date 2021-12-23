@@ -63,11 +63,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        SavedRequestAwareAuthenticationSuccessHandler successHandler =
-                new SavedRequestAwareAuthenticationSuccessHandler();
-        successHandler.setTargetUrlParameter("redirectTo");
-        successHandler.setDefaultTargetUrl(adminServer.path("/"));
-
         http
                 .cors(Customizer.withDefaults())
                 .csrf().disable()
@@ -80,13 +75,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                // Login
-                .formLogin().loginPage(adminServer.path("/login")).successHandler(successHandler)
-                .and()
-                //Log out
-                .logout().logoutUrl(adminServer.path("/logout"))
-                .and()
-                .httpBasic(Customizer.withDefaults())
                 // Exceptions
                 .exceptionHandling()
                 .authenticationEntryPoint(entryPoint)
@@ -95,9 +83,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 // Custom filters
-                .antMatcher("/bookings/**").addFilterBefore(
-                        jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
+                //TODO: Ignored by Spring, idk why
+//                .antMatcher("/bookings/**").addFilterBefore(
+//                        jwtAuthenticationFilter,
+//                        UsernamePasswordAuthenticationFilter.class
+//                );
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }

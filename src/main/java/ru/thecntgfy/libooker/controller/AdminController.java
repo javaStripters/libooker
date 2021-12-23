@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.model.DayOff;
@@ -14,13 +15,14 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("admin")
+@Validated
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
     private final DayOffRepo dayOffRepo;
 
     //TODO: Already exists
     @PostMapping("day-off")
+    @PreAuthorize("hasRole('ADMIN')")
     public DayOff addDayOff(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") @Parameter(example = "2021-12-31")LocalDate date
     ) {
@@ -29,6 +31,7 @@ public class AdminController {
 
     @DeleteMapping("day-off")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
     public void removeDayOff(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") @Parameter(example = "2021-12-31")LocalDate date
     ) {

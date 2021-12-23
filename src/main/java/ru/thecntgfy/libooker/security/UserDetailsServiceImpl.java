@@ -1,15 +1,18 @@
 package ru.thecntgfy.libooker.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.model.UserMapper;
 import ru.thecntgfy.libooker.repository.UserRepo;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -19,8 +22,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByUsername(username).get();
-        System.out.println(user);
-        return UserMapper.userToPrincipal(user);
+        Optional<User> user = userRepo.findByUsername(username);
+        if (user.isEmpty())
+            throw new UsernameNotFoundException("Not found");
+        return UserMapper.userToPrincipal(user.get());
     }
 }
