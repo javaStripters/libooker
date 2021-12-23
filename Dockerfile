@@ -1,4 +1,4 @@
-FROM gradle:7-jdk17 as builder
+FROM gradle:7-jdk16 as builder
 
 WORKDIR /opt/libooker/app-build/
 
@@ -13,7 +13,7 @@ COPY    src ./src
 # Build jar
 RUN gradle bootJar
 
-FROM openjdk:17-slim-bullseye
+FROM adoptopenjdk:16-openj9
 
 # Set unified timezone
 ENV     TZ Europe/Moscow
