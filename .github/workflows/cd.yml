@@ -86,6 +86,8 @@ jobs:
             export NGINX_CONFIG_PATH="/etc/nginx/docker/nginx.conf"
             export BACKEND_IMAGE="thecntgfy/libooker"
             export STORAGE_PATH="/var/lib/libooker"
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export DOWNLOAD_USERS_URL=${{ secrets.DOWNLOAD_USERS_URL }}
             cd /opt/libooker
             docker-compose pull
             docker-compose up -d

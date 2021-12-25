@@ -38,6 +38,5 @@ logging:
     file: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
 app:
   jwtExpirationInMs: 86400000
-  jwtSecret: ZXZlcnl0aGluZ2lzb2JqZWN0ZGFtbmluZWVkbG9uZ2Vyc2VjcmV0
-  dataSecret: bigwoodentable
+  jwtSecret: ${JWT_SECRET}
   downloadUsersUrl: ${DOWNLOAD_USERS_URL}
