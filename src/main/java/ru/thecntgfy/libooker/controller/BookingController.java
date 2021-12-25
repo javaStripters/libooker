@@ -2,7 +2,10 @@ package ru.thecntgfy.libooker.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +56,24 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(
+            summary = "Бронь.",
+            description = "Создает бронь для авторизованного пользователя с *from* до *to*",
+            security = { @SecurityRequirement(name = "bearer-key") }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = """
+                    - Бронь начинается и заканчивается в разные дни
+                    - Бронь раньше чем за неделю
+                    - Превышено ограничение по длительности одной брони
+                    """),
+            @ApiResponse(responseCode = "409", description = """
+                    - Достигнут лимит бронирования
+                    - Новая бронь пересекается с существующими
+                    - Нет доступного времени
+                    """)
+    })
     public Booking book(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Schema(example = "2021-12-23T12:00:00.00Z") LocalDateTime from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) @Schema(example = "2021-12-23T13:30:00.00Z") LocalDateTime to,
@@ -70,27 +90,54 @@ public class BookingController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("user/{username}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(
+            summary = "Все брони указанного пользователя",
+            description = """
+                            Все брони (активные, отмененные завершенные) брони **указанного** пользователя пользователя. 
+                            Доступно только администратору.
+                            """
+    )
     public Iterable<Booking> getBookingsForUserByAdmin(@PathVariable String username) {
             return bookingService.getBookingsForUser(username);
     }
 
     @GetMapping("user")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(
+            summary = "Все брони авторизованного пользователя",
+            description = "Все брони (активные, отмененные завершенные) брони **авторизованного** пользователя",
+            security = { @SecurityRequirement(name = "bearer-key") }
+    )
     public Iterable<Booking> getBookingsForUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return bookingService.getBookingsForUser(userPrincipal.getUsername());
     }
 
     //TODO: Return only present or future
     @GetMapping("user/active")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(
+            summary = "Активные брони авторизованного пользователя",
+            description = "Активные (не отмененные и не завершенные вручную) брони **авторизированного** пользователя",
+            security = { @SecurityRequirement(name = "bearer-key") }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "Пользователь не найден", content = @Content)
+    })
     public Iterable<Booking> getActiveBookingsForUser(Principal principal) {
         return bookingService.getActiveBookingsForUser(principal.getName());
     }
 
     @DeleteMapping("{bookingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @Operation(
+            summary = "Отмена брони",
+            description = "Помечает бронь c указанным *bookingId* как отмененную",
+            security = { @SecurityRequirement(name = "bearer-key") }
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Успешно"),
+            @ApiResponse(responseCode = "404", description = "Бронь не найдена"),
+            @ApiResponse(responseCode = "403", description = "Удаление брони другого пользователя не от имени администратора")
+    })
     public void removeBooking(
             @PathVariable long bookingId,
             @AuthenticationPrincipal UserPrincipal principal
@@ -101,8 +148,28 @@ public class BookingController {
             bookingService.removeBooking(bookingId, principal.getUsername());
     }
 
-    @PutMapping("{bookingId}")
-    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    @PutMapping("finish/{bookingId}")
+    @Operation(
+            summary = "Завершение текущей брони",
+            description = "Помечает бронь c указанным *bookingId* как завершенную вручную.",
+            security = { @SecurityRequirement(name = "bearer-key") }
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешное завершение. Возвращает бронь с измененным полем finishedManually"),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = """
+                                  Конфликт, если:
+                                  - Сеанс еще не начался
+                                  - Время брони прошло
+                                  - Бронь была отменена
+                                  - Бронь уже была закончена вручную
+                                  """,
+                    content = @Content
+            )
+    })
     public Booking finishBookingManually(
             @PathVariable long bookingId,
             @AuthenticationPrincipal UserPrincipal principal
