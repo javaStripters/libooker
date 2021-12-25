@@ -18,10 +18,6 @@ spring:
   devtools:
     restart:
       log-condition-evaluation-delta: false
-  security:
-    user:
-      name: sba-client
-      password: s3cret
 server:
   error:
     include-stacktrace: never
