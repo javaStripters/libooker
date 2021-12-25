@@ -21,7 +21,6 @@ import ru.thecntgfy.libooker.security.JwtProvider;
 import ru.thecntgfy.libooker.security.UserPrincipal;
 import ru.thecntgfy.libooker.service.UserServiceImpl;
 
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 @RestController
@@ -60,7 +59,6 @@ public class AuthController {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(username, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
 
         return authentication;
     }

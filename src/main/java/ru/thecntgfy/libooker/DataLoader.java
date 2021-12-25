@@ -35,6 +35,10 @@ public class DataLoader implements CommandLineRunner {
     //TODO: Proper buffering by saving separate entities / batches
     @Override
     public void run(String... args) throws Exception {
+        //TODO: Remove in production
+        if (userRepo.findByUsername("38763").isPresent())
+            return;
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(downloadUrl.openStream(), CHARSET));
 
         //LOGIN;PASS;F;I;O;TESTBOOK_NUM

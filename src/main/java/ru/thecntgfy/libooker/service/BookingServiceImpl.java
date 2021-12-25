@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -123,7 +124,28 @@ public class BookingServiceImpl {
         return booking;
     }
 
-    //TODO: User does not exist
+    //TODO: Move authority check to controller?
+    public Booking finishBooking(long bookingId, String username, GrantedAuthority authority) {
+        Booking booking = bookingRepo.findById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found!"));
+
+        if (!username.equals(booking.getUser().getUsername()) && !authority.getAuthority().equals("ROLE_ADMIN"))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Только администратор может заканчивать брони других пользователей!");
+
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+        if (booking.getDate().isBefore(today) || now.isBefore(booking.getStartTime()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Сеанс еще не начался!");
+        if (booking.getDate().isAfter(today) || now.isAfter(booking.getEndTime()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Время брони уже прошло!");
+        if (booking.isCanceled())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Бронь была отменена!");
+        if (booking.isFinishedManually())
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Попытка закончить бронь дважды!");
+
+        return booking.finish();
+    }
+
     public Set<Booking> getBookingsForUser(String username) {
         return bookingRepo.findAllByUser_Username(username);
     }
@@ -135,19 +157,21 @@ public class BookingServiceImpl {
 
         return user.getBookings()
                 .stream()
-                .filter(b -> !b.isCanceled()).collect(Collectors.toList());
+                .filter(b -> !b.isCanceled())
+                .filter(b -> !b.isFinishedManually())
+                .collect(Collectors.toList());
     }
 
     public void removeBooking(long bookingId) {
         Booking booking = bookingRepo.findActiveById(bookingId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронь не существует или уже отменена!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронь не существует, закончилась или уже отменена!"));
 
         booking.cancel();
     }
 
     public void removeBooking(long bookingId, String username) {
         Booking booking = bookingRepo.findActiveById(bookingId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронь не существует или уже отменена!"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Бронь не существует, закончилась или уже отменена!"));
 
         if (!booking.getUser().getUsername().equals(username))
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Только администратор может отменять брони других пользователей!");

@@ -15,12 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.dto.ScheduleStep;
 import ru.thecntgfy.libooker.model.Booking;
-import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.security.UserPrincipal;
 import ru.thecntgfy.libooker.service.BookingServiceImpl;
-import ru.thecntgfy.libooker.utils.TimeRange;
 
-import javax.validation.constraints.FutureOrPresent;
 import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -94,7 +91,7 @@ public class BookingController {
     @DeleteMapping("{bookingId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public void removeBookingByAdmin(
+    public void removeBooking(
             @PathVariable long bookingId,
             @AuthenticationPrincipal UserPrincipal principal
     ) {
@@ -102,5 +99,18 @@ public class BookingController {
             bookingService.removeBooking(bookingId);
         else
             bookingService.removeBooking(bookingId, principal.getUsername());
+    }
+
+    @PutMapping("{bookingId}")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public Booking finishBookingManually(
+            @PathVariable long bookingId,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+            return bookingService.finishBooking(
+                    bookingId,
+                    principal.getUsername(),
+                    principal.getAuthorities().stream().findAny().orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN))
+            );
     }
 }

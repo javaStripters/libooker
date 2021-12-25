@@ -49,6 +49,9 @@ public class Booking {
     @Setter(AccessLevel.PRIVATE)
     private boolean canceled = false;
 
+    @Setter(AccessLevel.PRIVATE)
+    private boolean finishedManually = false;
+
     protected Booking() {}
 
 
@@ -78,6 +81,12 @@ public class Booking {
     public Booking cancel() {
         if (canceled) throw new IllegalStateException("Cannot cancel already cancelled booking!");
         canceled = true;
+        return this;
+    }
+
+    public Booking finish() {
+        if (finishedManually) throw new IllegalStateException("Cannot finisged already finished booking!");
+        finishedManually = true;
         return this;
     }
 }

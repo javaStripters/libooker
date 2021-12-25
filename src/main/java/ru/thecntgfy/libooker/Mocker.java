@@ -23,6 +23,8 @@ public class Mocker implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+        if (userRepo.findByUsername("Vasya").isPresent())
+            return;
 
         User user = new User(
                 "Vasya",
