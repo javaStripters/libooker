@@ -29,13 +29,13 @@ public class DataLoader implements CommandLineRunner {
     private final UserRepo userRepo;
     private final PasswordEncoder encoder;
     @Value("${app.downloadUsersUrl}")
-    private String downloadUrl;
+    private URL downloadUrl;
     private final String CHARSET = "windows-1251";
 
     //TODO: Proper buffering by saving separate entities / batches
     @Override
     public void run(String... args) throws Exception {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(downloadUrl).openStream(), CHARSET));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(downloadUrl.openStream(), CHARSET));
 
         //LOGIN;PASS;F;I;O;TESTBOOK_NUM
         List<User> users = reader.lines()
