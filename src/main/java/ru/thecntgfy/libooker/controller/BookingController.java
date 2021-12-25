@@ -67,6 +67,7 @@ public class BookingController {
         if (LocalDateTime.now().plus(MAX_BOOKING_DISTANCE).toLocalDate().isBefore(from.toLocalDate()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Нельзя бронировать раньше чем за " + MAX_BOOKING_DISTANCE.toDays() + " дней");
 
+
         return bookingService.book(from, to, principal.getName());
     }
 

@@ -29,7 +29,7 @@ public class Booking {
     @ToString.Exclude
     private Workplace workplace;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE} )
             @JsonManagedReference
     @ToString.Exclude
     private User user;

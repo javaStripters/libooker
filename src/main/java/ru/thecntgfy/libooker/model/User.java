@@ -18,19 +18,33 @@ public class User {
     @Id @GeneratedValue
     protected Long id;
 
-    @Column(columnDefinition = "text", unique = true)
+    @Column(columnDefinition = "text", unique = true, nullable = false)
     private String username;
 
-    @Column(columnDefinition = "text")
+    //TODO: proper colum defs
+    @Column(columnDefinition = "text", nullable = false)
     private String password;
+
+    @Column(columnDefinition = "text")
+    private String lastname;
+
+    @Column(columnDefinition = "text")
+    private String firstname;
+
+    @Column(columnDefinition = "text")
+    private String patronymic;
+
+    @Column(columnDefinition = "text")
+    private String testbook;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "user")
     @OrderBy
     @JsonBackReference
-    private Set<Booking> bookings;
+    private Set<Booking> bookings = new HashSet<>();
 
     //TODO: Remove
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     Role role;
 
     protected User() {}
@@ -39,5 +53,15 @@ public class User {
         this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    public User(String username, String password, String lastname, String firstname, String patronymic, String testbook) {
+        this.username = username;
+        this.password = password;
+        this.lastname = lastname;
+        this.firstname = firstname;
+        this.patronymic = patronymic;
+        this.testbook = testbook;
+        this.role = lastname.equals("Афанасьев") ? Role.ADMIN : Role.STUDENT;
     }
 }

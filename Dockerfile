@@ -13,7 +13,7 @@ COPY    src ./src
 # Build jar
 RUN gradle bootJar
 
-FROM adoptopenjdk:16-openj9
+FROM adoptopenjdk:17
 
 # Set unified timezone
 ENV     TZ Europe/Moscow

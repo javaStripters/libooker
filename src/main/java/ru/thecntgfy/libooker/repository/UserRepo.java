@@ -7,6 +7,6 @@ import ru.thecntgfy.libooker.model.User;
 import java.util.Optional;
 
 @RepositoryRestResource(exported = false)
-public interface UserRepo extends CrudRepository<User, Long> {
+public interface UserRepo extends CrudRepository<User, String> {
     Optional<User> findByUsername(String username);
 }

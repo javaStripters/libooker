@@ -48,7 +48,6 @@ public class BookingServiceImpl {
 
     //TODO: Rework
     public Stream<ScheduleStep> getAvailableSchedule(LocalDate date, String username) {
-        User user = userRepo.findByUsername(username).get();
         Map<Workplace, TreeSet<TimeRange>> timeByWorkplace = availableTimeByWorkplace(date);
 
         TreeSet<TimeRange> availableTime = new TreeSet<>();
@@ -62,6 +61,7 @@ public class BookingServiceImpl {
         if (isDayOff)
             return schedule.stream().map(ScheduleStep::closed);
 
+        List<Booking> userBookings = bookingRepo.findAllActiveByUsername(username);
         return schedule.stream()
                 .map(timeRange -> {
                     boolean isAvailable = availableTime.headSet(new TimeRange(timeRange.from(), CLOSES), true).stream()
@@ -69,10 +69,10 @@ public class BookingServiceImpl {
                     if (!isAvailable)
                         return ScheduleStep.occupied(timeRange);
 
-                    boolean doesInterfereWithBooked = user.getBookings().stream()
+                    boolean doesInterfereWithBooked = userBookings.stream()
                             .filter(Predicate.not(Booking::isCanceled))
                             .filter(booking -> booking.getDate().equals(date))
-                            .anyMatch(booked -> booked.getTimeRange().doesInterfereExclusive(timeRange));
+                            .anyMatch(booked -> booked.getTimeRange().doesInterfereExclusive(timeRange) || booked.getTimeRange().equals(timeRange));
                     if (doesInterfereWithBooked)
                         return ScheduleStep.self(timeRange);
 
@@ -83,6 +83,7 @@ public class BookingServiceImpl {
     //TODO: Max user bookings
     //TODO: User not found
     //TODO: Only next week
+    //TODO: Disallow day off book
     public Booking book(LocalDateTime from, LocalDateTime to, String username) {
         if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)
             //TODO: Custom Exceptions
