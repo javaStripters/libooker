@@ -1,8 +1,9 @@
-package ru.thecntgfy.libooker.model;
+package ru.thecntgfy.libooker.model.utils;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.thecntgfy.libooker.dto.RegisterDTO;
+import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.security.UserPrincipal;
 
 import java.util.List;
@@ -25,11 +26,11 @@ public class UserMapper {
     }
 
     public static User registerDtoToUser(RegisterDTO dto) {
-        User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setPassword(encoder.encode(dto.getPassword()));
-        user.setRole(dto.getRole());
 
-        return user;
+        return new User(
+                dto.getUsername(),
+                encoder.encode(dto.getPassword()),
+                dto.getRole()
+        );
     }
 }

@@ -16,7 +16,7 @@ import ru.thecntgfy.libooker.dto.LoginDTO;
 import ru.thecntgfy.libooker.dto.RegisterDTO;
 import ru.thecntgfy.libooker.model.Role;
 import ru.thecntgfy.libooker.model.User;
-import ru.thecntgfy.libooker.model.UserMapper;
+import ru.thecntgfy.libooker.model.utils.UserMapper;
 import ru.thecntgfy.libooker.security.JwtProvider;
 import ru.thecntgfy.libooker.security.UserPrincipal;
 import ru.thecntgfy.libooker.service.UserServiceImpl;
