@@ -23,7 +23,6 @@ public class SimpleProductionCalendarServiceImpl {
         return isDayOffExternal(date) || isDayOfInternal(date);
     }
 
-    //TODO: Catch exceptions
     @SneakyThrows
     protected boolean isDayOffExternal(LocalDate date)  {
         HttpRequest request = HttpRequest.newBuilder(new URI(URL + date)).GET().build();

@@ -29,9 +29,8 @@ public class JwtProvider {
     }
 
     public String generateToken(Authentication authentication) {
-        //TODO: No conversion?
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        //TODO: java.time API?
+
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationInMs);
 

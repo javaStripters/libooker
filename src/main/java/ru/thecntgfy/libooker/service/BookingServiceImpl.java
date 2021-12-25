@@ -65,11 +65,6 @@ public class BookingServiceImpl {
         List<Booking> userBookings = bookingRepo.findAllActiveByUsername(username);
         return schedule.stream()
                 .map(timeRange -> {
-                    boolean isAvailable = availableTime.headSet(new TimeRange(timeRange.from(), CLOSES), true).stream()
-                            .anyMatch(range -> range.toInclusive().compareTo(timeRange.toInclusive()) >= 0);
-                    if (!isAvailable)
-                        return ScheduleStep.occupied(timeRange);
-
                     boolean doesInterfereWithBooked = userBookings.stream()
                             .filter(Predicate.not(Booking::isCanceled))
                             .filter(booking -> booking.getDate().equals(date))
@@ -77,12 +72,15 @@ public class BookingServiceImpl {
                     if (doesInterfereWithBooked)
                         return ScheduleStep.self(timeRange);
 
+                    boolean isAvailable = availableTime.headSet(new TimeRange(timeRange.from(), CLOSES), true).stream()
+                            .anyMatch(range -> range.toInclusive().compareTo(timeRange.toInclusive()) >= 0);
+                    if (!isAvailable)
+                        return ScheduleStep.occupied(timeRange);
+
                     return ScheduleStep.free(timeRange);
                 });
     }
 
-    //TODO: User not found
-    //TODO: Disallow day off book
     public Booking book(LocalDateTime from, LocalDateTime to, String username) {
         if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)
             //TODO: Custom Exceptions
@@ -92,12 +90,16 @@ public class BookingServiceImpl {
         LocalTime startTime = from.toLocalTime();
         LocalTime endTime = to.toLocalTime();
 
+        if (productionCalendar.isDayOff(date))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Нельзя бронировать в выходной!");
+
         TimeRange untilCloses = new TimeRange(startTime, CLOSES);
         TimeRange requested = new TimeRange(startTime, endTime);
 
         TimeRange bookedTime = TimeRange.min(untilCloses, requested);
 
-        User user = userRepo.findByUsername(username).get();
+        User user = userRepo.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Set<Booking> bookings = bookingRepo.findAllActiveByUserAndDate(user, date);
         if (bookings.size() >= MAX_BOOKINGS_FOR_USER)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Достигнут лимит бронирований!");

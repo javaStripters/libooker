@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 
-//TODO: Remove exception from resposse?
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
