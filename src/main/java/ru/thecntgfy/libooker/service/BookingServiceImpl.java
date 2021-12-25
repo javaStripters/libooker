@@ -81,9 +81,7 @@ public class BookingServiceImpl {
                 });
     }
 
-    //TODO: Max user bookings
     //TODO: User not found
-    //TODO: Only next week
     //TODO: Disallow day off book
     public Booking book(LocalDateTime from, LocalDateTime to, String username) {
         if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)

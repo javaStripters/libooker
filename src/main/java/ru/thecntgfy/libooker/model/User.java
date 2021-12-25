@@ -27,7 +27,6 @@ public class User {
     @Column(columnDefinition = "text", nullable = false)
     protected String password;
 
-    //TODO: Remove
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     protected Role role;

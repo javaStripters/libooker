@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 @Data
 public class CreateBookingReq {
     long userId;
-    //TODO: Uncomment
+    //TODO: Prod: Uncomment
 //    @FutureOrPresent
     @NotNull @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     LocalDateTime time;

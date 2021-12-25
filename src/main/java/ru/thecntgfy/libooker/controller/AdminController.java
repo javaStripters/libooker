@@ -20,7 +20,6 @@ import java.time.LocalDate;
 public class AdminController {
     private final DayOffRepo dayOffRepo;
 
-    //TODO: Already exists
     @PostMapping("day-off")
     @PreAuthorize("hasRole('ADMIN')")
     public DayOff addDayOff(

@@ -27,7 +27,7 @@ import ru.thecntgfy.libooker.security.JwtAuthenticationFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE)
-//TODO: Move Spring Boot Admin to docker container
+//TODO: Prod: Move Spring Boot Admin to docker container
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final AdminServerProperties adminServer;

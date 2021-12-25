@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-//TODO: Rewrite long generated methods with @Query
+//TODO: Rewrite long generated methods with @Query or write impl with querydsl
 @RepositoryRestResource(exported = false)
 public interface BookingRepo extends CrudRepository<Booking, Long> {
     Page<Booking> findAll(Pageable pageable);

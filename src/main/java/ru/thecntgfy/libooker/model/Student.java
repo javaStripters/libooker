@@ -10,7 +10,6 @@ import java.util.*;
 
 @Entity
 @Getter @Setter
-//TODO: Remove
 @ToString
 public class Student extends User {
     @Column(columnDefinition = "text")

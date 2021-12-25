@@ -36,7 +36,6 @@ public class BookingController {
 
     private final Duration MAX_BOOKING_DISTANCE = Duration.ofDays(7);
 
-    //TODO: Return FutureOrPresent?
     @GetMapping("available")
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     @Validated
@@ -111,7 +110,7 @@ public class BookingController {
         return bookingService.getBookingsForUser(userPrincipal.getUsername());
     }
 
-    //TODO: Return only present or future
+    //TODO: Prod: Return only present or future
     @GetMapping("user/active")
     @Operation(
             summary = "Активные брони авторизованного пользователя",
