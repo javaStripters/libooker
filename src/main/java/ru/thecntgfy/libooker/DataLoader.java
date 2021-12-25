@@ -1,26 +1,15 @@
 package ru.thecntgfy.libooker;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.Charsets;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import ru.thecntgfy.libooker.model.User;
+import ru.thecntgfy.libooker.model.Student;
 import ru.thecntgfy.libooker.repository.UserRepo;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.Key;
 import java.util.List;
 
 @Component
@@ -42,10 +31,10 @@ public class DataLoader implements CommandLineRunner {
         BufferedReader reader = new BufferedReader(new InputStreamReader(downloadUrl.openStream(), CHARSET));
 
         //LOGIN;PASS;F;I;O;TESTBOOK_NUM
-        List<User> users = reader.lines()
+        List<Student> users = reader.lines()
                 .skip(1)
                 .map(s -> s.split(";"))
-                .map(split -> new User(
+                .map(split -> new Student(
                         split[0],
                         encoder.encode(split[1]),
                         split[2],
