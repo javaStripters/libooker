@@ -18,6 +18,7 @@ import ru.thecntgfy.libooker.model.Role;
 import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.model.UserMapper;
 import ru.thecntgfy.libooker.security.JwtProvider;
+import ru.thecntgfy.libooker.security.UserPrincipal;
 import ru.thecntgfy.libooker.service.UserServiceImpl;
 
 import javax.transaction.Transactional;
@@ -33,9 +34,13 @@ public class AuthController {
 
     @PostMapping("sign-in")
     public JwtResponse authenticateUser(@Valid @RequestBody LoginDTO dto) {
-        String token = authenticate(dto.getUsername(), dto.getPassword());
+        Authentication authentication = authenticate(dto.getUsername(), dto.getPassword());
 
-        return new JwtResponse(token);
+        String token = jwtProvider.generateToken(authentication);
+        //TODO: Rework, it`s ugly
+        Role role = Role.valueOf(((UserPrincipal) authentication.getPrincipal()).getAuthorities().stream().findAny().get().getAuthority().substring(5));
+
+        return new JwtResponse(token, role);
     }
 
     @PostMapping("register")
@@ -51,11 +56,12 @@ public class AuthController {
         return userService.createUser(user);
     }
 
-    protected String authenticate(String username, String password) {
+    protected Authentication authenticate(String username, String password) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(username, password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return jwtProvider.generateToken(authentication);
+
+        return authentication;
     }
 }
