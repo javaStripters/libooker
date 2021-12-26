@@ -9,7 +9,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.model.DayOff;
+import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.repository.DayOffRepo;
+import ru.thecntgfy.libooker.repository.UserRepo;
 import ru.thecntgfy.libooker.service.SimpleProductionCalendarServiceImpl;
 import ru.thecntgfy.libooker.service.value.Day;
 
@@ -22,6 +24,7 @@ import java.time.LocalDate;
 public class AdminController {
     private final DayOffRepo dayOffRepo;
     private final SimpleProductionCalendarServiceImpl productionCalendar;
+    private final UserRepo userRepo;
 
     @PostMapping("day-off")
     @PreAuthorize("hasRole('ADMIN')")
@@ -51,5 +54,11 @@ public class AdminController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to
     ) {
         return productionCalendar.forRange(from, to);
+    }
+
+    @PostMapping("user-search")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Iterable<? extends User> userSearch(@RequestParam String query) {
+        return userRepo.searchStudents(query);
     }
 }

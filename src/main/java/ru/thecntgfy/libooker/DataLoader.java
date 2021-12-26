@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.thecntgfy.libooker.model.Student;
 import ru.thecntgfy.libooker.repository.UserRepo;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.io.*;
 import java.net.URL;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
+    @PersistenceContext
+    private final EntityManager entityManager;
     private final UserRepo userRepo;
     private final PasswordEncoder encoder;
     @Value("${app.downloadUsersUrl}")
