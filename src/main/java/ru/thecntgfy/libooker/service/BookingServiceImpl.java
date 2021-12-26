@@ -98,7 +98,6 @@ public class BookingServiceImpl {
                 });
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Booking book(LocalDateTime from, LocalDateTime to, String username) {
         if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)
             //TODO: Custom Exceptions

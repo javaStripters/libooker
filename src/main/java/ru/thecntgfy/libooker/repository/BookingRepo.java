@@ -3,12 +3,14 @@ package ru.thecntgfy.libooker.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import ru.thecntgfy.libooker.model.Booking;
 import ru.thecntgfy.libooker.model.User;
 
+import javax.persistence.LockModeType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -95,6 +97,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
         return findByIdAndCanceledFalseAndFinishedManuallyFalse(id);
     }
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     default List<Booking> findAllActiveByUsername(String username) {
         return findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalse(username);
     }
