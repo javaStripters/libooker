@@ -16,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.tags.Param;
 import ru.thecntgfy.libooker.dto.ScheduleStep;
 import ru.thecntgfy.libooker.model.Booking;
 import ru.thecntgfy.libooker.security.UserPrincipal;
@@ -96,8 +97,13 @@ public class BookingController {
                             Доступно только администратору.
                             """
     )
-    public Iterable<Booking> getBookingsForUserByAdmin(@PathVariable String username) {
-            return bookingService.getBookingsForUser(username);
+    public Iterable<Booking> getBookingsForUserByAdmin(
+            @PathVariable String username,
+            @RequestParam(defaultValue = "false") Boolean archive
+    ) {
+            return archive
+                   ? bookingService.getArchivedBookingsForUser(username)
+                   : bookingService.getBookingsForUser(username);
     }
 
     @GetMapping("user")
@@ -106,8 +112,13 @@ public class BookingController {
             description = "Все брони (активные, отмененные завершенные) брони **авторизованного** пользователя",
             security = { @SecurityRequirement(name = "bearer-key") }
     )
-    public Iterable<Booking> getBookingsForUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return bookingService.getBookingsForUser(userPrincipal.getUsername());
+    public Iterable<Booking> getBookingsForUser(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestParam(defaultValue = "false") Boolean archive
+    ) {
+        return  archive
+                ? bookingService.getArchivedBookingsForUser(userPrincipal.getUsername())
+                : bookingService.getBookingsForUser(userPrincipal.getUsername());
     }
 
     //TODO: Prod: Return only present or future

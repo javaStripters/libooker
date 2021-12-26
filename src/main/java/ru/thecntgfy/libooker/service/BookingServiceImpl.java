@@ -150,6 +150,10 @@ public class BookingServiceImpl {
         return bookingRepo.findAllByUser_Username(username);
     }
 
+    public List<Booking> getArchivedBookingsForUser(String username) {
+        return bookingRepo.findAllArchivedByUser(username);
+    }
+
     public List<Booking> getActiveBookingsForUser(String username) {
         User user = userRepo.findByUsername(username).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User %s not found".formatted(username))
