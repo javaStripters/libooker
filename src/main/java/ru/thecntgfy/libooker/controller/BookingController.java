@@ -13,10 +13,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.tags.Param;
 import ru.thecntgfy.libooker.dto.ScheduleStep;
 import ru.thecntgfy.libooker.model.Booking;
 import ru.thecntgfy.libooker.security.UserPrincipal;
@@ -26,7 +27,6 @@ import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -84,6 +84,7 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Operation(
             summary = "Бронь.",
             description = "Создает бронь для авторизованного пользователя с *from* до *to*",

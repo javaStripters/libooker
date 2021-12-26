@@ -106,8 +106,8 @@ public class BookingServiceImpl {
         LocalTime startTime = from.toLocalTime();
         LocalTime endTime = to.toLocalTime();
 
-//        if (productionCalendar.isDayOff(date))
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Нельзя бронировать в выходной!");
+        if (productionCalendar.isDayOff(date))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Нельзя бронировать в выходной!");
 
         TimeRange untilCloses = new TimeRange(startTime, CLOSES);
         TimeRange requested = new TimeRange(startTime, endTime);
