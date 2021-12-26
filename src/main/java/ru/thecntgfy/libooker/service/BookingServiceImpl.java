@@ -3,6 +3,7 @@ package ru.thecntgfy.libooker.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,19 @@ public class BookingServiceImpl {
                 : bookingRepo.findAll(pageable);
     }
 
+    public List<Booking> getCurrentBookings() {
+        return bookingRepo.findAllCurrent();
+    }
+
+    public Slice<Booking> getNextBookings() {
+        return bookingRepo.findNext(Pageable.unpaged());
+    }
+
+    public Slice<Booking> getTodayClosed() {
+        return bookingRepo.findTodayClosed(Pageable.unpaged());
+    }
+
+
     //TODO: Rework
     public Stream<ScheduleStep> getAvailableSchedule(LocalDate date, String username) {
         Map<Workplace, TreeSet<TimeRange>> timeByWorkplace = availableTimeByWorkplace(date);
@@ -92,8 +106,8 @@ public class BookingServiceImpl {
         LocalTime startTime = from.toLocalTime();
         LocalTime endTime = to.toLocalTime();
 
-        if (productionCalendar.isDayOff(date))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Нельзя бронировать в выходной!");
+//        if (productionCalendar.isDayOff(date))
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "Нельзя бронировать в выходной!");
 
         TimeRange untilCloses = new TimeRange(startTime, CLOSES);
         TimeRange requested = new TimeRange(startTime, endTime);
@@ -186,6 +200,7 @@ public class BookingServiceImpl {
         booking.cancel();
     }
 
+    //TODO: Store booked in memory
     protected Map<Workplace, TreeSet<TimeRange>> availableTimeByWorkplace(LocalDate date) {
         List<Booking> booked = bookingRepo.findAllActiveByDate(date);
 

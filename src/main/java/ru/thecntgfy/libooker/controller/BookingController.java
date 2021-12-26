@@ -49,6 +49,7 @@ public class BookingController {
         return bookingService.getAvailableSchedule(date, principal.getName()).collect(Collectors.toList());
     }
 
+    //TODO: Remove pageable, add limit
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
@@ -58,6 +59,27 @@ public class BookingController {
     ) {
         Optional<LocalDate> date = today ? Optional.of(LocalDate.of(2021, 12, 27)) : Optional.empty();
         return bookingService.getBookings(pageable, date);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("today/current")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public Iterable<Booking> getCurrentBookings() {
+        return bookingService.getCurrentBookings();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("today/next")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public Iterable<Booking> getNextBookings() {
+        return bookingService.getNextBookings();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("today/closed")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public Iterable<Booking> getClosedBookings() {
+        return bookingService.getTodayClosed();
     }
 
     @PostMapping

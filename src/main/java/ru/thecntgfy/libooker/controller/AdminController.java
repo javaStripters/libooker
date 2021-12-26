@@ -26,6 +26,7 @@ public class AdminController {
     private final SimpleProductionCalendarServiceImpl productionCalendar;
     private final UserRepo userRepo;
 
+    //TODO: Remove bookings
     @PostMapping("day-off")
     @PreAuthorize("hasRole('ADMIN')")
     public DayOff addDayOff(

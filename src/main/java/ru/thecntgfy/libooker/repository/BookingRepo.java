@@ -2,6 +2,7 @@ package ru.thecntgfy.libooker.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -39,11 +40,6 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     Set<Booking> findAllByUserAndDateAndCanceledFalseAndFinishedManuallyFalse(User user, LocalDate date);
 
-//    from Booking b join User u
-//    where u.username = ?1
-//    or (b.date < current_date or (b.date = current_date  and b.endTime < current_time))
-//    or b.finishedManually = true
-//    or b.canceled = true
     //TODO: Find out why plain join doesn`t work
     @Query("""
            from Booking b inner join b.user u
@@ -55,6 +51,35 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
            )
            """)
     List<Booking> findAllArchivedByUser(String username);
+
+    @Query("""
+           from Booking 
+           where date = current_date 
+           and startTime <= current_time 
+           and endTime >= current_time 
+           and finishedManually = false 
+           and canceled = false 
+           order by startTime
+           """)
+    List<Booking> findAllCurrent();
+
+    @Query("""
+           from Booking
+           where date = current_date
+           and startTime > current_time
+           and canceled = false
+           """)
+    Slice<Booking> findNext(Pageable pageable);
+
+    @Query("""
+           from Booking
+           where date = current_date
+           and endTime <= current_time
+           or canceled = true
+           or finishedManually = true
+           order by startTime
+           """)
+    Slice<Booking> findTodayClosed(Pageable pageable);
 
     void removeByUser_UsernameAndId(String username, long id);
 

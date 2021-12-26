@@ -17,7 +17,7 @@ public class Workplace extends BaseEntity {
     @GeneratedValue
     private Long id;
 
-    @Column(columnDefinition = "text")
+    @Column(columnDefinition = "text", unique = true)
     private String name;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.PERSIST}, mappedBy = "workplace")
