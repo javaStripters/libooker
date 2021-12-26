@@ -98,7 +98,6 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
         return findByIdAndCanceledFalseAndFinishedManuallyFalse(id);
     }
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     default List<Booking> findAllActiveByUsername(String username) {
         return findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalse(username);
     }

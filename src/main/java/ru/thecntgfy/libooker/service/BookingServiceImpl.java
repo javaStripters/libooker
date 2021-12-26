@@ -1,6 +1,7 @@
 package ru.thecntgfy.libooker.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -98,8 +99,7 @@ public class BookingServiceImpl {
                 });
     }
 
-    @Transactional
-    public Booking book(LocalDateTime from, LocalDateTime to, String username) {
+    public synchronized Booking book(LocalDateTime from, LocalDateTime to, String username) {
         if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)
             //TODO: Custom Exceptions
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Максимальная длительность брони: " + MAX_BOOKING_DURATION.toMinutes() + "мин.");

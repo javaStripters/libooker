@@ -13,8 +13,9 @@ import java.util.Optional;
 
 @RepositoryRestResource(exported = false)
 public interface UserRepo extends CrudRepository<User, String> {
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<User> findByUsername(String username);
+
+    Optional<User> findLockingByUsername(String username);
 
     @Query(value = """
                    select * from student
