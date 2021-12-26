@@ -105,7 +105,7 @@ public class BookingServiceImpl {
         Set<Booking> bookings = bookingRepo.findAllActiveByUserAndDate(user, date);
         if (bookings.size() >= MAX_BOOKINGS_FOR_USER)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Достигнут лимит бронирований!");
-        if (bookings.stream().anyMatch(booking -> booking.getTimeRange().doesInterfereExclusive(bookedTime)))
+        if (bookings.stream().anyMatch(booking -> booking.getTimeRange().doesInterfereExclusive(bookedTime) || booking.getTimeRange().equals(bookedTime)))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Новая бронь не должна пересекаться у уже существующими!");
 
         Map<Workplace, TreeSet<TimeRange>> availableTimeByWorkplace = availableTimeByWorkplace(date);
