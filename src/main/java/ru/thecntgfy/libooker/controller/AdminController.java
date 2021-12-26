@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.model.DayOff;
 import ru.thecntgfy.libooker.repository.DayOffRepo;
+import ru.thecntgfy.libooker.service.SimpleProductionCalendarServiceImpl;
+import ru.thecntgfy.libooker.service.value.Day;
 
 import java.time.LocalDate;
 
@@ -19,6 +21,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class AdminController {
     private final DayOffRepo dayOffRepo;
+    private final SimpleProductionCalendarServiceImpl productionCalendar;
 
     @PostMapping("day-off")
     @PreAuthorize("hasRole('ADMIN')")
@@ -38,5 +41,15 @@ public class AdminController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Выходной не существует!"));
 
         dayOffRepo.delete(dayOff);
+    }
+
+    //TODO: Validation
+    @GetMapping("day-off")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Iterable<Day> calendar(
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate from,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate to
+    ) {
+        return productionCalendar.forRange(from, to);
     }
 }
