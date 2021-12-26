@@ -19,6 +19,8 @@ import java.util.Set;
 public interface BookingRepo extends CrudRepository<Booking, Long> {
     Page<Booking> findAll(Pageable pageable);
 
+    Page<Booking> findAllByDate(Pageable pageable, LocalDate date);
+
     Optional<Booking> findByIdAndCanceledFalseAndFinishedManuallyFalse(long id);
 
     List<Booking> findAllByDate(LocalDate day);

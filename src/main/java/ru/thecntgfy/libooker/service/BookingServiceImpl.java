@@ -43,8 +43,10 @@ public class BookingServiceImpl {
     private final UserRepo userRepo;
     private final SimpleProductionCalendarServiceImpl productionCalendar;
 
-    public Page<Booking> getBookings(Pageable pageable) {
-        return bookingRepo.findAll(pageable);
+    public Page<Booking> getBookings(Pageable pageable, Optional<LocalDate> dateOptional) {
+        return dateOptional.isPresent()
+                ? bookingRepo.findAllByDate(pageable, dateOptional.get())
+                : bookingRepo.findAll(pageable);
     }
 
     //TODO: Rework

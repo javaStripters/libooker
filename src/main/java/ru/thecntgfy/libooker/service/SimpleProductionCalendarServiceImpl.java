@@ -71,7 +71,7 @@ public class SimpleProductionCalendarServiceImpl {
         HttpRequest request = HttpRequest.newBuilder(new URI(baseURL + date)).GET().build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        char res = response.body().charAt(0);
+        int res = Integer.parseInt(response.body());
 
         return responseToState(res) == Day.State.UNMODIFIABLE_DAYOFF;
     }

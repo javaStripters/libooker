@@ -26,6 +26,8 @@ import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -50,8 +52,12 @@ public class BookingController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     @Operation(security = { @SecurityRequirement(name = "bearer-key") })
-    public Iterable<Booking> getBookings(@Parameter(hidden = true) Pageable pageable) {
-        return bookingService.getBookings(pageable);
+    public Iterable<Booking> getBookings(
+            @RequestParam(defaultValue = "false") boolean today,
+            @Parameter(hidden = true) Pageable pageable
+    ) {
+        Optional<LocalDate> date = today ? Optional.of(LocalDate.of(2021, 12, 27)) : Optional.empty();
+        return bookingService.getBookings(pageable, date);
     }
 
     @PostMapping
