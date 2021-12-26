@@ -3,8 +3,6 @@ spring:
     url: jdbc:postgresql://db:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
-  jpa:
-    show-sql: true
 logging:
   file:
     name: /var/log/libooker.log
