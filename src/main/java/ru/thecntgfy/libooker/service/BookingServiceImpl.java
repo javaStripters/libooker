@@ -7,6 +7,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.thecntgfy.libooker.dto.ScheduleStep;
@@ -97,6 +98,7 @@ public class BookingServiceImpl {
                 });
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Booking book(LocalDateTime from, LocalDateTime to, String username) {
         if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)
             //TODO: Custom Exceptions

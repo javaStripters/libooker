@@ -84,7 +84,6 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     @Operation(
             summary = "Бронь.",
             description = "Создает бронь для авторизованного пользователя с *from* до *to*",
