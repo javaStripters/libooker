@@ -9,6 +9,7 @@ import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @SpringBootApplication
 @EnableAdminServer
 @EnableTransactionManagement
+@EnableJpaAuditing
 public class LibookerApplication {
 
     public static void main(String[] args) {

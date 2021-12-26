@@ -10,7 +10,6 @@ import java.util.*;
 
 @Entity
 @Getter @Setter
-@ToString
 public class Student extends User {
     @Column(columnDefinition = "text")
     private String lastname;

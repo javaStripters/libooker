@@ -15,7 +15,7 @@ import java.util.Set;
 @Setter
 @ToString
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue
     protected Long id;

@@ -12,7 +12,7 @@ import java.util.SortedSet;
 @Entity
 @Getter
 @Setter
-public class Workplace {
+public class Workplace extends BaseEntity {
     @Id
     @GeneratedValue
     private Long id;

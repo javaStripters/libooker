@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 @Getter
 @Setter
 @ToString
-public class Booking {
+public class Booking extends BaseEntity {
     public static final LocalTime OPENS = LocalTime.of(10, 0);
 
     @Id
