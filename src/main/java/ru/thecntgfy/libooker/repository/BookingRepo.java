@@ -78,9 +78,9 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
     @Query("""
            from Booking
            where date = current_date
-           and endTime <= current_time
-           or canceled = true
-           or finishedManually = true
+           and (endTime <= current_time
+                or canceled = true
+                or finishedManually = true)
            order by startTime
            """)
     Slice<Booking> findTodayClosed(Pageable pageable);
