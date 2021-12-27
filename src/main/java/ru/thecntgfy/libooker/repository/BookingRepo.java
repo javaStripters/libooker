@@ -45,6 +45,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     //TODO: Find out why plain join doesn`t work
     @Query("""
+           select b
            from Booking b inner join b.user u
            where u.username = ?1
            and (
@@ -85,6 +86,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
     Slice<Booking> findTodayClosed(Pageable pageable);
 
     @Query("""
+           select b
            from Booking b 
            join b.user u
            where u.username = ?1
