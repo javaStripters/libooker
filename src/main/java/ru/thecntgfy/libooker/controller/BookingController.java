@@ -122,7 +122,8 @@ public class BookingController {
             description = """
                             Все брони (активные, отмененные завершенные) брони **указанного** пользователя пользователя. 
                             Доступно только администратору.
-                            """
+                            """,
+            security = { @SecurityRequirement(name = "bearer-key") }
     )
     public Iterable<Booking> getBookingsForUserByAdmin(
             @PathVariable String username,
