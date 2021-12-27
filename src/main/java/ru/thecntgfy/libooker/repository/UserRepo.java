@@ -19,7 +19,6 @@ public interface UserRepo extends CrudRepository<User, String> {
 
     @Query(value = """
                    select * from student
-                   inner join booking b on b.user_id = student.id
                    where firstname % ?1 or firstname ilike '%' || ?1 || '%'
                    or lastname % ?1 or lastname ilike '%' || ?1 || '%'
                    or patronymic % ?1 or patronymic ilike '%' || ?1 || '%'
