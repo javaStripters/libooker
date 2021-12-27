@@ -35,7 +35,8 @@ import java.util.stream.Stream;
 @Transactional
 public class BookingServiceImpl {
     private final LocalTime OPENS = LocalTime.of(9, 0);
-    private final LocalTime CLOSES = LocalTime.of(19, 0);
+    private final LocalTime CLOSES = LocalTime.of(
+            19, 0);
     private final Duration SCHEDULE_STEP = Duration.ofMinutes(30);
     private final Duration MAX_BOOKING_DURATION = Duration.ofHours(2);
     private final int MAX_BOOKINGS_FOR_USER = 5;
@@ -100,7 +101,7 @@ public class BookingServiceImpl {
     }
 
     public synchronized Booking book(LocalDateTime from, LocalDateTime to, String username) {
-        if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)
+        if (Duration.between(from, to).compareTo(MAX_BOOKING_DURATION) > 0)
             //TODO: Custom Exceptions
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Максимальная длительность брони: " + MAX_BOOKING_DURATION.toMinutes() + " мин.");
 
@@ -123,7 +124,7 @@ public class BookingServiceImpl {
         if (allActive.size() >= MAX_BOOKINGS_FOR_USER)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Достигнут лимит бронирований!");
         if (dateBookings.stream().anyMatch(booking -> booking.getTimeRange().doesInterfereExclusive(bookedTime) || booking.getTimeRange().equals(bookedTime)))
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Новая бронь не должна пересекаться у уже существующими!");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Новая бронь не должна пересекаться с уже существующими!");
 
         Map<Workplace, TreeSet<TimeRange>> availableTimeByWorkplace = availableTimeByWorkplace(date);
         Booking booking = null;
