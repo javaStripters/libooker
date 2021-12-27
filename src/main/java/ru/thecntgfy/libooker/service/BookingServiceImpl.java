@@ -153,9 +153,9 @@ public class BookingServiceImpl {
 
         LocalDate today = LocalDate.now();
         LocalTime now = LocalTime.now();
-        if (booking.getDate().isBefore(today) || now.isBefore(booking.getStartTime()))
+        if (booking.getDate().isAfter(today) || (booking.getDate().equals(today) && now.isBefore(booking.getStartTime())))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Сеанс еще не начался!");
-        if (booking.getDate().isAfter(today) || (booking.getDate().equals(today) && now.isAfter(booking.getEndTime())))
+        if (booking.getDate().isBefore(today) || (booking.getDate().equals(today) && now.isAfter(booking.getEndTime())))
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Время брони уже прошло!");
         if (booking.isCanceled())
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Бронь была отменена!");
