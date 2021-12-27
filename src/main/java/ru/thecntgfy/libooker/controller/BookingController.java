@@ -8,7 +8,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -127,11 +131,16 @@ public class BookingController {
     )
     public Iterable<Booking> getBookingsForUserByAdmin(
             @PathVariable String username,
-            @RequestParam(defaultValue = "false") Boolean archive
+            @RequestParam(defaultValue = "false") Boolean archive,
+            @PageableDefault(size = Integer.MAX_VALUE, sort = { "date", "startTime", "endTime" }) Pageable pageable
     ) {
-            return archive
-                   ? bookingService.getArchivedBookingsForUser(username, Pageable.unpaged())
-                   : bookingService.getCurrentAndFutureForUser(username, Pageable.unpaged());
+        //TODO: Better way of getting pr
+        PageRequest pageRequest = (PageRequest) pageable;
+        if (archive) {
+            pageRequest = pageRequest.withSort(pageRequest.getSort().descending());
+            return bookingService.getArchivedBookingsForUser(username, pageRequest);
+        }
+        return bookingService.getCurrentAndFutureForUser(username, pageRequest);
     }
 
     @GetMapping("user")
