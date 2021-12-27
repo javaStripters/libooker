@@ -3,9 +3,11 @@ package ru.thecntgfy.libooker.dto;
 import lombok.Data;
 import ru.thecntgfy.libooker.utils.TimeRange;
 
+import java.sql.Time;
+
 @Data
 public class ScheduleStep {
-    public enum ScheduleState {FREE, SELF, OCCUPIED, CLOSED  }
+    public enum ScheduleState {FREE, SELF, OCCUPIED, CLOSED, PASSED  }
 
     TimeRange range;
     ScheduleState state;
@@ -24,6 +26,10 @@ public class ScheduleStep {
 
     public static ScheduleStep closed(TimeRange range) {
         return new ScheduleStep(range, ScheduleState.CLOSED);
+    }
+
+    public static ScheduleStep passed(TimeRange range) {
+        return new ScheduleStep(range, ScheduleState.PASSED);
     }
 
     public ScheduleStep(TimeRange range, ScheduleState state) {

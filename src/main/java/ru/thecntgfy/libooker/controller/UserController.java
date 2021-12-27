@@ -15,6 +15,7 @@ import ru.thecntgfy.libooker.model.User;
 import ru.thecntgfy.libooker.repository.UserRepo;
 
 import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("users")
@@ -37,5 +38,26 @@ public class UserController {
     public User getUser(@PathVariable String username) {
         return userRepo.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("statistic")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public Map<String, Integer> getStatisticsByUser(Principal principal) {
+        return getStatistics(principal.getName());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("{username}/statistic")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public Map<String, Integer> getStatisitcsByAdmin(@PathVariable String username) {
+        return getStatistics(username);
+    }
+
+    protected Map<String, Integer> getStatistics(String username) {
+        return Map.of(
+                "hours", userRepo.countUserHours(username),
+                "activeBookings", userRepo.countUserFutureBookings(username),
+                "closedSessions", userRepo.countClosedBookings(username)
+        );
     }
 }

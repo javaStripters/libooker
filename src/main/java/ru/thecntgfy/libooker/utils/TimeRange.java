@@ -36,8 +36,16 @@ public record TimeRange(LocalTime from, LocalTime toInclusive) implements Compar
         return (from.isBefore(time) || from.equals(time)) && (toInclusive.isAfter(time) || toInclusive.equals(time));
     }
 
+    public boolean includesHalfCut(LocalTime time) {
+        return (from.isBefore(time) || from.equals(time) && toInclusive.isAfter(time));
+    }
+
     public boolean includes(TimeRange other) {
         return includes(other.from) && includes(other.toInclusive);
+    }
+
+    public boolean isBefore(LocalTime other) {
+        return toInclusive.isBefore(other);
     }
 
     public Pair<TimeRange> differenceInside(TimeRange other) {

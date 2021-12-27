@@ -27,19 +27,11 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     Optional<Booking> findByIdAndCanceledFalseAndFinishedManuallyFalse(long id);
 
-    List<Booking> findAllByDate(LocalDate day);
-
     List<Booking> findAllByDateAndCanceledFalseAndFinishedManuallyFalse(LocalDate date);
 
-    Set<Booking> findAllByUserId(long userId);
-
-    Slice<Booking> findAllByUser_Username(String username, Pageable pageable);
+    List<Booking> findAllByDateBetween(LocalDate from, LocalDate to);
 
     List<Booking> findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalse(String username);
-
-    Set<Booking> findAllByUser_UsernameAndDate(String username, LocalDate date);
-
-    Set<Booking> findAllByUserAndDate(User user, LocalDate date);
 
     Set<Booking> findAllByUserAndDateAndCanceledFalseAndFinishedManuallyFalse(User user, LocalDate date);
 

@@ -81,9 +81,14 @@ public class BookingServiceImpl {
         if (isDayOff)
             return schedule.stream().map(ScheduleStep::closed);
 
+        LocalTime now = LocalTime.now();
+        LocalDate today = LocalDate.now();
         List<Booking> userBookings = bookingRepo.findAllActiveByUsername(username);
         return schedule.stream()
                 .map(timeRange -> {
+                    if (date.isBefore(today) || (date.equals(today) && timeRange.isBefore(now)))
+                        return ScheduleStep.passed(timeRange);
+
                     boolean doesInterfereWithBooked = userBookings.stream()
                             .filter(Predicate.not(Booking::isCanceled))
                             .filter(booking -> booking.getDate().equals(date))
