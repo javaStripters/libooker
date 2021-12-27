@@ -19,10 +19,11 @@ public interface UserRepo extends CrudRepository<User, String> {
 
     @Query(value = """
                    select * from student
-                   where firstname % ?1
-                   or lastname % ?1
-                   or patronymic % ?1
-                   or testbook % ?1
+                   inner join booking b on b.user_id = student.id
+                   where firstname % ?1 or firstname ilike '%' || ?1 || '%'
+                   or lastname % ?1 or lastname ilike '%' || ?1 || '%'
+                   or patronymic % ?1 or patronymic ilike '%' || ?1 || '%'
+                   or testbook % ?1 or testbook ilike '%' || ?1 || '%'
                    order by (firstname <-> ?1) + (lastname <-> ?1) + (patronymic <-> ?1) + (testbook <-> ?1) 
                    """, nativeQuery = true)
     List<Student> searchStudents(String query);
