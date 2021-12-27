@@ -13,8 +13,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -116,6 +114,7 @@ public class BookingController {
         return bookingService.book(from, to, principal.getName());
     }
 
+    //TODO: Add normal paging. Maybe impl cursor
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("user/{username}")
     @Operation(
@@ -130,24 +129,25 @@ public class BookingController {
             @RequestParam(defaultValue = "false") Boolean archive
     ) {
             return archive
-                   ? bookingService.getArchivedBookingsForUser(username)
-                   : bookingService.getBookingsForUser(username);
+                   ? bookingService.getArchivedBookingsForUser(username, Pageable.unpaged())
+                   : bookingService.getCurrentAndFutureForUser(username, Pageable.unpaged());
     }
 
     @GetMapping("user")
-    @Operation(
-            summary = "Все брони авторизованного пользователя",
-            description = "Все брони (активные, отмененные завершенные) брони **авторизованного** пользователя",
-            security = { @SecurityRequirement(name = "bearer-key") }
-    )
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
     public Iterable<Booking> getBookingsForUser(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestParam(defaultValue = "false") Boolean archive
+            Pageable pageable
     ) {
-        return  archive
-                ? bookingService.getArchivedBookingsForUser(userPrincipal.getUsername())
-                : bookingService.getBookingsForUser(userPrincipal.getUsername());
+        return bookingService.getCurrentAndFutureForUser(userPrincipal.getUsername(), pageable);
     }
+
+    @GetMapping("user/archive")
+    @Operation(security = { @SecurityRequirement(name = "bearer-key") })
+    public Iterable<Booking> getArchivedBookingForUser(Principal principal, Pageable pageable) {
+        return bookingService.getArchivedBookingsForUser(principal.getName(), pageable);
+    }
+
 
     //TODO: Prod: Return only present or future
     @GetMapping("user/active")

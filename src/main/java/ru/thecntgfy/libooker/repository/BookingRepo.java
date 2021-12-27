@@ -33,7 +33,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     Set<Booking> findAllByUserId(long userId);
 
-    Set<Booking> findAllByUser_Username(String username);
+    Slice<Booking> findAllByUser_Username(String username, Pageable pageable);
 
     List<Booking> findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalse(String username);
 
@@ -53,7 +53,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
             or b.finishedManually = true
            )
            """)
-    List<Booking> findAllArchivedByUser(String username);
+    Slice<Booking> findAllArchivedByUser(String username, Pageable pageable);
 
     @Query("""
            from Booking 
@@ -83,6 +83,14 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
            order by startTime
            """)
     Slice<Booking> findTodayClosed(Pageable pageable);
+
+    @Query("""
+           from Booking b 
+           join b.user u
+           where u.username = ?1
+           and b.date >= current_date 
+           """)
+    Slice<Booking> findFutureOrCurrentBookingForUsername(String username, Pageable pageable);
 
     void removeByUser_UsernameAndId(String username, long id);
 

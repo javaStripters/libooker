@@ -102,7 +102,7 @@ public class BookingServiceImpl {
     public synchronized Booking book(LocalDateTime from, LocalDateTime to, String username) {
         if (Duration.between(to, from).compareTo(MAX_BOOKING_DURATION) > 0)
             //TODO: Custom Exceptions
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Максимальная длительность брони: " + MAX_BOOKING_DURATION.toMinutes() + "мин.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Максимальная длительность брони: " + MAX_BOOKING_DURATION.toMinutes() + " мин.");
 
         LocalDate date = from.toLocalDate();
         LocalTime startTime = from.toLocalTime();
@@ -165,12 +165,12 @@ public class BookingServiceImpl {
         return booking.finish();
     }
 
-    public Set<Booking> getBookingsForUser(String username) {
-        return bookingRepo.findAllByUser_Username(username);
+    public Slice<Booking> getCurrentAndFutureForUser(String username, Pageable pageable) {
+        return bookingRepo.findFutureOrCurrentBookingForUsername(username, pageable);
     }
 
-    public List<Booking> getArchivedBookingsForUser(String username) {
-        return bookingRepo.findAllArchivedByUser(username);
+    public Slice<Booking> getArchivedBookingsForUser(String username, Pageable pageable) {
+        return bookingRepo.findAllArchivedByUser(username, pageable);
     }
 
     public List<Booking> getActiveBookingsForUser(String username) {
