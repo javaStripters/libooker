@@ -83,7 +83,7 @@ public class BookingServiceImpl {
 
         LocalTime now = LocalTime.now();
         LocalDate today = LocalDate.now();
-        List<Booking> userBookings = bookingRepo.findActiveByDateForUser(username, today);
+        List<Booking> userBookings = bookingRepo.findActiveByDateForUser(username, date);
         return schedule.stream()
                 .map(timeRange -> {
                     if (date.isBefore(today) || (date.equals(today) && timeRange.isBefore(now)))
