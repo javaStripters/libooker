@@ -82,7 +82,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
            from Booking b 
            join b.user u
            where u.username = ?1
-           and b.date >= current_date 
+           and (b.date > current_date or (b.date = current_date and b.endTime > current_time))
            """)
     Slice<Booking> findFutureOrCurrentBookingForUsername(String username, Pageable pageable);
 

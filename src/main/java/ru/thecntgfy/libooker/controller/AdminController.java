@@ -90,7 +90,7 @@ public class AdminController {
         );
     }
 
-    @GetMapping("stats/visits/")
+    @GetMapping("stats/visits")
     @PreAuthorize("hasRole('ADMIN')")
     public Map<Integer, Integer> getVisitStats() {
         return todayVisitsAndWorkplaceUsage();
