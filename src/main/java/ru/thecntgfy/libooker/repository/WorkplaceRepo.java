@@ -18,16 +18,17 @@ public interface WorkplaceRepo extends CrudRepository<Workplace, Long> {
                    count(distinct user_id) as visitors,
                    extract(minutes from avg(booking.end_time - booking.start_time)) as avgSessionMin
             from booking
-            where date <= ?1
-            and date >= ?2
+            where date >= ?1
+            and date <= ?2
+            and not canceled
            """, nativeQuery = true)
     OverallStats calcOverallStats(LocalDate start, LocalDate end);
 
     @Query(value = """
         select count(*)
         from booking
-        where date <= ?1 
-        and date >= ?2
+        where date >= ?1 
+        and date <= ?2
         and canceled;
         """, nativeQuery = true)
     Integer countCancelled(LocalDate start, LocalDate end);

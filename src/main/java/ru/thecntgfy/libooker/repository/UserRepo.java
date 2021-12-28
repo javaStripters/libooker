@@ -36,7 +36,7 @@ public interface UserRepo extends CrudRepository<User, String> {
             and b.canceled = false
             and (date <= cast(now() as date) or (date <= cast(now() as date) and end_time < cast(now() as time)))
             """, nativeQuery = true)
-    Integer countUserHours(String username);
+    Optional<Integer> countUserHours(String username);
 
     @Query(value =
         """
@@ -48,7 +48,7 @@ public interface UserRepo extends CrudRepository<User, String> {
         and not b.canceled
         and not b.finished_manually;
         """, nativeQuery = true)
-    Integer countUserFutureBookings(String username);
+    Optional<Integer> countUserFutureBookings(String username);
 
     //TODO: Add finishedManually
     @Query(value =
@@ -59,5 +59,5 @@ public interface UserRepo extends CrudRepository<User, String> {
             and b.canceled = false
             and (date <= cast(now() as date) or (date <= cast(now() as date) and end_time < cast(now() as time)))
             """, nativeQuery = true)
-    Integer countClosedBookings(String username);
+    Optional<Integer> countClosedBookings(String username);
 }

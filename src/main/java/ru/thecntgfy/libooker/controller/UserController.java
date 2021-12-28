@@ -55,9 +55,9 @@ public class UserController {
 
     protected Map<String, Integer> getStatistics(String username) {
         return Map.of(
-                "hours", userRepo.countUserHours(username),
-                "activeBookings", userRepo.countUserFutureBookings(username),
-                "closedSessions", userRepo.countClosedBookings(username)
+                "hours", userRepo.countUserHours(username).orElse(0),
+                "activeBookings", userRepo.countUserFutureBookings(username).orElse(0),
+                "closedSessions", userRepo.countClosedBookings(username).orElse(0)
         );
     }
 }
