@@ -93,6 +93,17 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
     """)
     List<Booking> findActiveFutureOrCurrentForUser(String username);
 
+    @Query("""
+    select b
+    from Booking b 
+    join b.user u
+    where u.username = ?1
+    and b.date = ?2
+    and b.canceled = false 
+    and b.finishedManually = false 
+    """)
+    List<Booking> findActiveByDateForUser(String username, LocalDate date);
+
     default List<Booking> findAllActiveByDate(LocalDate date) {
         return findAllByDateAndCanceledFalseAndFinishedManuallyFalse(date);
     }

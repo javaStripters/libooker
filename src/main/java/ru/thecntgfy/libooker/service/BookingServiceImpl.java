@@ -83,7 +83,7 @@ public class BookingServiceImpl {
 
         LocalTime now = LocalTime.now();
         LocalDate today = LocalDate.now();
-        List<Booking> userBookings = bookingRepo.findActiveFutureOrCurrentForUser(username);
+        List<Booking> userBookings = bookingRepo.findActiveByDateForUser(username, today);
         return schedule.stream()
                 .map(timeRange -> {
                     if (date.isBefore(today) || (date.equals(today) && timeRange.isBefore(now)))
@@ -125,6 +125,7 @@ public class BookingServiceImpl {
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Set<Booking> dateBookings = bookingRepo.findAllActiveByUserAndDate(user, date);
+        //TODO: Add date
         List<Booking> allActive = bookingRepo.findActiveFutureOrCurrentForUser(username);
         if (allActive.size() >= MAX_BOOKINGS_FOR_USER)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Достигнут лимит бронирований!");
