@@ -31,7 +31,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     List<Booking> findAllByDateBetween(LocalDate from, LocalDate to);
 
-    List<Booking> findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(String username, LocalDate date);
+    List<Booking> findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(String username, LocalDate dateAfter, LocalDate dateEquals);
 
     Set<Booking> findAllByUserAndDateAndCanceledFalseAndFinishedManuallyFalse(User user, LocalDate date);
 
@@ -102,6 +102,6 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     //TODO: Check
     default List<Booking> findAllActiveByUsername(String username) {
-        return findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(username, LocalDate.now());
+        return findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(username, LocalDate.now(), LocalDate.now());
     }
 }
