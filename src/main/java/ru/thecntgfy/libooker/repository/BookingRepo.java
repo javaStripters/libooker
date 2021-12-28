@@ -29,10 +29,6 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     List<Booking> findAllByDateAndCanceledFalseAndFinishedManuallyFalse(LocalDate date);
 
-    List<Booking> findAllByDateBetween(LocalDate from, LocalDate to);
-
-    List<Booking> findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(String username, LocalDate date, LocalDate dateEquals);
-
     Set<Booking> findAllByUserAndDateAndCanceledFalseAndFinishedManuallyFalse(User user, LocalDate date);
 
     //TODO: Find out why plain join doesn`t work
@@ -97,8 +93,6 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
     """)
     List<Booking> findActiveFutureOrCurrentForUser(String username);
 
-    void removeByUser_UsernameAndId(String username, long id);
-
     default List<Booking> findAllActiveByDate(LocalDate date) {
         return findAllByDateAndCanceledFalseAndFinishedManuallyFalse(date);
     }
@@ -109,10 +103,5 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     default Optional<Booking> findActiveById(long id) {
         return findByIdAndCanceledFalseAndFinishedManuallyFalse(id);
-    }
-
-    //TODO: Check
-    default List<Booking> findAllActiveByUsername(String username) {
-        return findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(username, LocalDate.now());
     }
 }
