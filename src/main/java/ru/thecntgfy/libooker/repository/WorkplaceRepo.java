@@ -40,6 +40,7 @@ public interface WorkplaceRepo extends CrudRepository<Workplace, Long> {
             day as (
               select * from booking
                 where date = ?1
+                and not canceled
             )
             select hour, count(id) from hours
                               left outer join day on
