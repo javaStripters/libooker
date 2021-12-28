@@ -42,7 +42,7 @@ public interface WorkplaceRepo extends CrudRepository<Workplace, Long> {
                 where date = ?1
                 and not canceled
             )
-            select hour, count(id) from hours
+            select hour, count(distinct user_id) from hours
                               left outer join day on
                                   hour >= extract(hour from day.start_time)
                                       and cast(hour * interval '1 hour' as time) < day.end_time
