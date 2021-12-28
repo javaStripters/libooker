@@ -97,7 +97,7 @@ public class AdminController {
     }
 
     protected Map<Integer, Integer> todayVisitsAndWorkplaceUsage() {
-        return workplaceRepo.calcDayStats(LocalDate.of(2021, 12, 27)).stream()
+        return workplaceRepo.calcDayStats(LocalDate.now()).stream()
                 .flatMap(Arrays::stream)
                 .collect(Collectors.toMap(DayStats::getHour, DayStats::getCount));
     }
