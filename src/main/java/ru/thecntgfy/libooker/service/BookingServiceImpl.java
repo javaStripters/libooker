@@ -125,7 +125,7 @@ public class BookingServiceImpl {
         User user = userRepo.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Set<Booking> dateBookings = bookingRepo.findAllActiveByUserAndDate(user, date);
-        List<Booking> allActive = bookingRepo.findAllActiveByUsername(username);
+        List<Booking> allActive = bookingRepo.findActiveFutureOrCurrentForUser(username);
         if (allActive.size() >= MAX_BOOKINGS_FOR_USER)
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Достигнут лимит бронирований!");
         if (dateBookings.stream().anyMatch(booking -> booking.getTimeRange().doesInterfereExclusive(bookedTime) || booking.getTimeRange().equals(bookedTime)))

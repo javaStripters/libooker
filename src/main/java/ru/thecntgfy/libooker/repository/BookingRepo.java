@@ -31,7 +31,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     List<Booking> findAllByDateBetween(LocalDate from, LocalDate to);
 
-    List<Booking> findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(String username, LocalDate dateAfter, LocalDate dateEquals);
+    List<Booking> findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(String username, LocalDate date, LocalDate dateEquals);
 
     Set<Booking> findAllByUserAndDateAndCanceledFalseAndFinishedManuallyFalse(User user, LocalDate date);
 
@@ -86,6 +86,17 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
            """)
     Slice<Booking> findFutureOrCurrentBookingForUsername(String username, Pageable pageable);
 
+    @Query("""
+    select b
+    from Booking b
+    join b.user u
+    where u.username = ?1
+    and (b.date > current_date or (b.date = current_date and b.endTime > current_time))
+    and b.canceled = false
+    and b.finishedManually = false 
+    """)
+    List<Booking> findActiveFutureOrCurrentForUser(String username);
+
     void removeByUser_UsernameAndId(String username, long id);
 
     default List<Booking> findAllActiveByDate(LocalDate date) {
@@ -102,6 +113,6 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
 
     //TODO: Check
     default List<Booking> findAllActiveByUsername(String username) {
-        return findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(username, LocalDate.now(), LocalDate.now());
+        return findAllByUser_UsernameAndCanceledFalseAndFinishedManuallyFalseAndDateAfterOrDateEquals(username, LocalDate.now());
     }
 }
