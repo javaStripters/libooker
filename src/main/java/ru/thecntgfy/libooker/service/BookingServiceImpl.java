@@ -53,8 +53,8 @@ public class BookingServiceImpl {
                 : bookingRepo.findAll(pageable);
     }
 
-    public List<Booking> getCurrentBookings() {
-        return bookingRepo.findAllCurrent();
+    public Slice<Booking> getCurrentBookings() {
+        return bookingRepo.findAllCurrent(Pageable.unpaged());
     }
 
     public Slice<Booking> getNextBookings() {

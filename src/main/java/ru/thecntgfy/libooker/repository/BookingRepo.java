@@ -57,7 +57,7 @@ public interface BookingRepo extends CrudRepository<Booking, Long> {
            and canceled = false 
            order by startTime
            """)
-    List<Booking> findAllCurrent();
+    Slice<Booking> findAllCurrent(Pageable pageable);
 
     @Query("""
            from Booking
