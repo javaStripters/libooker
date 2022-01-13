@@ -13,13 +13,15 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.*;
 import java.net.URL;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Timer;
 
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
-    @PersistenceContext
-    private final EntityManager entityManager;
     private final UserRepo userRepo;
     private final PasswordEncoder encoder;
     @Value("${app.downloadUsersUrl}")
@@ -27,6 +29,7 @@ public class DataLoader implements CommandLineRunner {
     private final String CHARSET = "windows-1251";
 
     //TODO: Proper buffering by saving separate entities / batches
+    //TODO: Logging
     @Override
     public void run(String... args) throws Exception {
         //TODO: Remove in production
@@ -35,10 +38,11 @@ public class DataLoader implements CommandLineRunner {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(downloadUrl.openStream(), CHARSET));
 
-        //LOGIN;PASS;F;I;O;TESTBOOK_NUM
+        // логин,пароль,имя,фамилия,отчество,зачетная книжка
         List<Student> users = reader.lines()
-                .skip(1)
-                .map(s -> s.split(";"))
+                .map(s -> s.split(","))
+                .filter(arr -> arr.length == 6)
+                .parallel()
                 .map(split -> new Student(
                         split[0],
                         encoder.encode(split[1]),
