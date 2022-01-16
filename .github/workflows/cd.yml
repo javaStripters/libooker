@@ -2,35 +2,12 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ prod ]
   pull_request:
-    branches: [ master ]
+    branches: [ prod ]
   workflow_dispatch:
 
 jobs:
-  build-arm:
-    runs-on: self-hosted
-    steps:
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          platforms: linux/arm64
-          push: true
-          tags: thecntgfy/libooker:latest
-          cache-from: type=registry,ref=thecntgfy/libooker:latest
-          cache-to: type=inline
-
   build-amd64:
     runs-on: ubuntu-20.04
     steps:
@@ -50,52 +27,5 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: thecntgfy/libooker:latest
-          cache-from: type=registry,ref=thecntgfy/libooker:latest
+          cache-from: type=registry,ref=thecntgfy/libooker:prod
           cache-to: type=inline
-
-  deploy:
-    runs-on: ubuntu-20.04
-    needs: build-arm
-    steps:
-      - uses: actions/checkout@v2
-      - name: Copy nginx.conf
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSHKEY }}
-          source: "./docker/nginx.conf"
-          target: "/etc/nginx/"
-          debug: true
-
-      - name: Copy docker-compose
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSHKEY }}
-          source: "docker-compose.yml"
-          target: "/opt/libooker"
-
-      - name: Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSHKEY }}
-          script: |
-            export NGINX_CONFIG_PATH="/etc/nginx/docker/nginx.conf"
-            export BACKEND_IMAGE="thecntgfy/libooker"
-            export STORAGE_PATH="/var/lib/libooker"
-            export JWT_SECRET=${{ secrets.JWT_SECRET }}
-            export DOWNLOAD_USERS_URL=${{ secrets.DOWNLOAD_USERS_URL }}
-            cd /opt/libooker
-            docker-compose pull
-            docker-compose up -d
-
-      - name: Healthcheck
-        uses: Jtalk/url-health-check-action@v2
-        with:
-          url: ${{ secrets.HOST }}/actuator/health
-          retry-delay: 10s
-          max-attempts: 6
