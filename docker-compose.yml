@@ -26,6 +26,7 @@ services:
     image: nginx:latest
     volumes:
       - ${NGINX_CONFIG_PATH:-./docker/nginx.conf}:/etc/nginx/nginx.conf
+      - ${NGINX_DATA_PATH:-/www/data}:/www/data
     ports:
       - "80:80"
     depends_on:

@@ -8,6 +8,7 @@ import lombok.ToString;
 import javax.persistence.*;
 import java.util.*;
 
+//TODO: Change id?
 @Entity
 @Getter @Setter
 public class Student extends User {
