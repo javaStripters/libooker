@@ -26,6 +26,6 @@ jobs:
         with:
           platforms: linux/amd64
           push: true
-          tags: thecntgfy/libooker:latest
+          tags: thecntgfy/libooker:prod
           cache-from: type=registry,ref=thecntgfy/libooker:prod
           cache-to: type=inline
