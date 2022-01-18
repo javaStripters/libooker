@@ -3,6 +3,7 @@ package ru.thecntgfy.libooker.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.NaturalId;
 import org.springframework.core.Ordered;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ public class Workplace extends BaseEntity {
     @GeneratedValue
     private Long id;
 
+    @NaturalId
     @Column(columnDefinition = "text", unique = true)
     private String name;
 
