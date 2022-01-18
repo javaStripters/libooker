@@ -82,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 // Custom filters
                 .requestMatchers()
-                .antMatchers("/bookings/**", "/users/**", "/admin/**")
+                .antMatchers("/bookings/**", "/users/**", "/admin/**", "/auth/**")
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
