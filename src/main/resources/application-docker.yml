@@ -5,6 +5,15 @@ spring:
     password: ${POSTGRES_PASSWORD}
   jpa:
     show-sql: false
+  boot:
+    admin:
+      client:
+        enabled: false
 logging:
   file:
     name: /var/log/libooker.log
+server:
+  forward-headers-strategy: framework
+springdoc:
+  swagger-ui:
+    config-url: /api/v3/api-docs/

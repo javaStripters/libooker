@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.util.List;
 
 @SpringBootApplication
-@EnableAdminServer
 @EnableTransactionManagement
+@EnableAdminServer
 @EnableJpaAuditing
 public class LibookerApplication {
 
