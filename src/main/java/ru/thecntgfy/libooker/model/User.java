@@ -1,6 +1,7 @@
 package ru.thecntgfy.libooker.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -25,6 +26,7 @@ public class User extends BaseEntity {
 
     //TODO: proper colum defs
     @Column(columnDefinition = "text", nullable = false)
+    @JsonIgnore
     protected String password;
 
     @Enumerated(EnumType.STRING)

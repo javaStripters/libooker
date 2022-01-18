@@ -9,6 +9,7 @@ import ru.thecntgfy.libooker.model.projection.OverallStats;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RepositoryRestResource(exported = false)
 public interface WorkplaceRepo extends CrudRepository<Workplace, Long> {
@@ -50,4 +51,10 @@ public interface WorkplaceRepo extends CrudRepository<Workplace, Long> {
             order by hour;
             """, nativeQuery = true)
     List<DayStats[]> calcDayStats(LocalDate date);
+
+    boolean existsByName(String name);
+
+    default boolean existsByNaturalId(String id) {
+        return existsByName(id);
+    }
 }
