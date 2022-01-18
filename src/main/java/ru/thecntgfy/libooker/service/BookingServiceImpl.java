@@ -35,8 +35,7 @@ import java.util.stream.Stream;
 @Transactional
 public class BookingServiceImpl {
     private final LocalTime OPENS = LocalTime.of(9, 0);
-    private final LocalTime CLOSES = LocalTime.of(
-            19, 0);
+    private final LocalTime CLOSES = LocalTime.of(21, 0);
     private final Duration SCHEDULE_STEP = Duration.ofMinutes(30);
     private final Duration MAX_BOOKING_DURATION = Duration.ofHours(2);
     private final int MAX_BOOKINGS_FOR_USER = 5;
