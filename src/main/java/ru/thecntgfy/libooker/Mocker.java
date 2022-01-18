@@ -12,6 +12,9 @@ import ru.thecntgfy.libooker.repository.BookingRepo;
 import ru.thecntgfy.libooker.repository.UserRepo;
 import ru.thecntgfy.libooker.repository.WorkplaceRepo;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
 @Component
 @RequiredArgsConstructor
 @Order(Integer.MAX_VALUE - 1)
@@ -33,19 +36,29 @@ public class Mocker implements CommandLineRunner {
         );
         userRepo.save(user);
 
-        Workplace workplace = new Workplace("KA-123");
-        workplaceRepo.save(workplace);
+        User admin = new User(
+                "RGAU",
+                "$2a$04$01RbolL5TRdm76ZLa92IsOnhq7VjWBUUeSqJpeOCYKjnS/BX/IPiS",
+                Role.ADMIN
+        );
+        userRepo.save(admin);
 
-        Workplace workplace1 = new Workplace("BZ-678");
-        workplaceRepo.save(workplace1);
+        int workplacesOneStart = 41;
+        int workplacesOneEndInclusive = 58;
 
-//        Booking booking = new Booking(workplace, user, LocalDate.now(), new TimeRange(LocalTime.of(12, 0), LocalTime.of(14, 0)));
-//        bookingRepo.save(booking);
-//
-//        Booking booking1 = new Booking(workplace, user, LocalDate.now(), new TimeRange(LocalTime.of(16, 0), LocalTime.of(18, 0)));
-//        bookingRepo.save(booking1);
-//
-//        Booking booking2 = new Booking(workplace1, user, LocalDate.now(), new TimeRange(LocalTime.of(15, 0), LocalTime.of(17, 0)));
-//        bookingRepo.save(booking2);
+        List<Workplace> workplaces = IntStream.range(workplacesOneStart, workplacesOneEndInclusive)
+                .boxed()
+                .map(i -> new Workplace(i.toString()))
+                .toList();
+        workplaceRepo.saveAll(workplaces);
+
+        int workplacesTwoStart = 61;
+        int workplacesTwoEndInclusive = 69;
+
+        List<Workplace> workplaces1 = IntStream.range(workplacesTwoStart, workplacesTwoEndInclusive)
+                .boxed()
+                .map(i -> new Workplace(i.toString()))
+                .toList();
+        workplaceRepo.saveAll(workplaces1);
     }
 }
