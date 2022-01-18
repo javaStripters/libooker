@@ -19,12 +19,12 @@ public class Workplace extends BaseEntity {
     private Long id;
 
     @NaturalId
-    @Column(columnDefinition = "text", unique = true)
+    @Column(columnDefinition = "text", unique = true, nullable = false)
     private String name;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.PERSIST}, mappedBy = "workplace")
     @OrderBy
-            @JsonBackReference
+    @JsonBackReference
     Set<Booking> bookings;
 
     protected Workplace() {}

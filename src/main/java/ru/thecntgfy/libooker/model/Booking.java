@@ -24,12 +24,12 @@ public class Booking extends BaseEntity {
     @GeneratedValue
     protected Long id;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
             @JsonManagedReference
     @ToString.Exclude
     private Workplace workplace;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE} )
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
             @JsonManagedReference
     @ToString.Exclude
     private User user;
